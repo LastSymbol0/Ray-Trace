@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="somefuckingnicescenename" width="1024" height="720">
+	<cam>
+		<pos> 0,0,0</pos>
+		<rot> 0,0,0</rot>
+	</cam>
+	<cam>
+		<pos> f,0,0</pos>
+		<rot> 0,f,0</rot>
+	</cam>
+	<cam>
+		<pos> 2,0,0</pos>
+		<rot> 0,4,4</rot>
+	</cam>
+</scene>
