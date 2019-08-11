@@ -73,6 +73,7 @@ typedef struct	s_scene
 	t_obj		*objects;
 	t_light		*light;
 
+	char		*name;
 	int			width;
 	int			height;
 }				t_scene;
