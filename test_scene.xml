@@ -11,5 +11,9 @@
 	<cam>
 		<pos> 2,0,0</pos>
 		<rot> 0,4,4</rot>
+		<radius> 5 </radius>
 	</cam>
+	<cylinder>
+		<rot> 0,4,4</rot>
+	</cylinder>
 </scene>

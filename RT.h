@@ -78,6 +78,24 @@ typedef struct	s_scene
 	int			height;
 }				t_scene;
 
+int			ft_atoi_base(char *str, int base);
+
+
+/*
+** p_maic.c
+*/
 t_scene	*parser(char *filename);
+
+/*
+** p_alloc.c
+*/
+void	scene_memory_alloc(t_scene *sc, xmlNodePtr root);
+
+/*
+** utils.c
+*/
+void	ft_err(char *err, int status);
+void	set_tabs(int n);
+int		arr_len(char **arr);
 
 #endif
