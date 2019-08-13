@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   p_alloc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aillia <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/13 16:50:27 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/13 16:50:38 by aillia           ###   ########.fr       */
+/*   Updated: 2019/08/13 19:35:36 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	scene_memory_alloc(t_scene *sc, xmlNodePtr root)
 	int	obj_count;
 	int	light_count;
 
-	light_count = count_lights(root);
+	light_count = count_lights(root->children);
 	obj_count = xmlChildElementCount(root) - light_count;
 	// sc = (t_scene *)ft_memalloc(sizeof(t_scene));
 	sc->objects = (t_obj *)ft_memalloc(sizeof(t_obj) * obj_count);

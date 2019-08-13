@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   vec.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aillia <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 19:19:26 by aillia            #+#    #+#             */
-/*   Updated: 2019/07/06 19:19:34 by aillia           ###   ########.fr       */
+/*   Updated: 2019/08/13 20:07:31 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../rtv1.h"
+#include "RT.h"
 
 t_ray	new_ray(t_vec *orig, t_vec *dir)
 {
 	t_ray	ray;
 
-	ray.orig = orig;
-	ray.dir = dir;
+	ray.orig = *orig;
+	ray.dir = *dir;
 	return (ray);
 }
 

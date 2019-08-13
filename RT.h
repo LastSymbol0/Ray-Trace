@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RT.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aillia <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/11 15:11:50 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/11 15:11:54 by aillia           ###   ########.fr       */
+/*   Updated: 2019/08/13 20:05:52 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@
 # include "libxml2/libxml/parser.h"
 # include "libxml2/libxml/tree.h"
 # include <stdio.h>
+# include <math.h>
+
+# define WIDTH sc->width
+# define HEIGHT sc->height
+# define RAY_ARR sc->ray_arr
 
 enum			e_typeobject
 {
@@ -43,8 +48,8 @@ typedef struct	s_vec
 
 typedef struct	s_ray
 {
-	t_vec		*orig;
-	t_vec		*dir;
+	t_vec		orig;
+	t_vec		dir;
 }				t_ray;
 
 typedef struct	s_light
@@ -90,6 +95,22 @@ t_scene	*parser(char *filename);
 ** p_alloc.c
 */
 void	scene_memory_alloc(t_scene *sc, xmlNodePtr root);
+
+/*
+** p_utils.c
+*/
+t_vec	parse_vec(char *s);
+t_color	parse_color(char *s);
+short	get_type(char *s);
+void	recurs(xmlNodePtr node, int n);
+
+/*
+** p_set.c
+*/
+void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type);
+void	scene_set_objects(t_scene *sc, xmlNodePtr root);
+int		scene_set_cam(t_scene *sc, xmlNodePtr cur);
+// void	scene_set_light(t_scene *sc, xmlNodePtr cur);
 
 /*
 ** utils.c

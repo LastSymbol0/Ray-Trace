@@ -1,6 +1,6 @@
 NAME=RT
 
-SRC=./src/parser/*.c ./src/*.c ./libft/libft.a
+SRC=./src/parser/*.c ./src/vec/*.c ./src/*.c ./libft/libft.a
 
 OBJ=$(SRC:%.c=%.o)
 
