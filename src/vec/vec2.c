@@ -1,38 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   vec2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aillia <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/08/11 17:28:37 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/11 17:28:39 by aillia           ###   ########.fr       */
+/*   Created: 2019/07/28 16:31:44 by aillia            #+#    #+#             */
+/*   Updated: 2019/07/28 16:31:46 by aillia           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RT.h"
+#include "../rtv1.h"
 
-void	set_ray_arr(t_scene *sc)
+t_vec	v_norm(t_vec v)
 {
-	
+	return (v_scale(v, 1.0 / v_magn(v)));
 }
 
-void	ray_trace(t_scene *sc)
+float	v_magn(t_vec v)
 {
-
+	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
 }
 
-int		main(int ac, char **av)
+t_vec	v_scale(t_vec v, float n)
 {
-	t_scene *sc;
+	v.x *= n;
+	v.y *= n;
+	v.z *= n;
+	return (v);
+}
 
-	if (ac == 2)
-	{
-		sc = parser(av[1]);
-		set_ray_arr(sc);
-		ray_trace(sc);
-	}
-	else
-		write(1, "1 argument plz\n", 15);
-	return (0);
+t_vec	v_add(t_vec v1, t_vec v2)
+{
+	t_vec v;
+
+	v.x = v1.x + v2.x;
+	v.y = v1.y + v2.y;
+	v.z = v1.z + v2.z;
+	return (v);
 }

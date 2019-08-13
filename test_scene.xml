@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="somefuckingnicescenename" width="2024" height="1420">
+<scene name="somefuckingnicescenename" width="2024" height="1420" ambient="20" max_reflections="4">
 	<cam>
 		<pos> 0,0,0</pos>
 		<rot> 0,0,0</rot>
@@ -13,7 +13,7 @@
 		<rot> 0,4,4</rot>
 		<radius> 5 </radius>
 	</cam>
-	<cylinder>
+	<cylinder reflection_intens="60">
 		<rot> 0,4,4</rot>
 	</cylinder>
 </scene>

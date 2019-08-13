@@ -82,7 +82,7 @@ int			ft_atoi_base(char *str, int base);
 
 
 /*
-** p_maic.c
+** p_main.c
 */
 t_scene	*parser(char *filename);
 
@@ -97,5 +97,17 @@ void	scene_memory_alloc(t_scene *sc, xmlNodePtr root);
 void	ft_err(char *err, int status);
 void	set_tabs(int n);
 int		arr_len(char **arr);
+
+/*
+** vec.c & vec2.c
+*/
+t_vec			v_minus(t_vec v1, t_vec v2);
+float			v_dot(t_vec a, t_vec b);
+t_vec			v_new(float x, float y, float z);
+t_vec			v_norm(t_vec v);
+float			v_magn(t_vec v);
+t_vec			v_scale(t_vec v, float n);
+t_vec			v_add(t_vec v1, t_vec v2);
+float			v_angle(t_vec a, t_vec b);
 
 #endif
