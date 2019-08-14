@@ -56,7 +56,7 @@ typedef struct	s_light
 {
 	t_vec		pos;
 	float		intensity;
-	int			inside;
+	t_color		color;
 }				t_light;
 
 typedef struct	s_obj
@@ -72,11 +72,12 @@ typedef struct	s_scene
 {
 	t_obj		cam;
 	float		ambient;
+	int			max_reflections;
 
 	t_ray		*ray_arr;
 
 	t_obj		*objects;
-	t_light		*light;
+	t_light		*lights;
 
 	char		*name;
 	int			width;
@@ -110,7 +111,7 @@ void	recurs(xmlNodePtr node, int n);
 void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type);
 void	scene_set_objects(t_scene *sc, xmlNodePtr root);
 int		scene_set_cam(t_scene *sc, xmlNodePtr cur);
-// void	scene_set_light(t_scene *sc, xmlNodePtr cur);
+void	scene_set_lights(t_scene *sc, xmlNodePtr cur);
 
 /*
 ** utils.c

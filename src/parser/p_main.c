@@ -19,7 +19,6 @@ t_scene	*parser(char *filename)
 	xmlNodePtr	root;
 
 	printf("Oh shit!\n");
-	// sc = NULL;
 	sc = (t_scene *)ft_memalloc(sizeof(t_scene));
 	doc = xmlReadFile(filename, NULL, 0);
 	root = xmlDocGetRootElement(doc);
@@ -27,8 +26,7 @@ t_scene	*parser(char *filename)
 	if (scene_set_cam(sc, root->children) != 1)
 		ft_err("Something wrong with camera count", 1);
 	scene_set_objects(sc, root);
-	// scene_set_ligth(sc, root->children);
-	// sc->objects = (t_obj *)ft_memalloc(sizeof(t_obj) * xmlChildElementCount(root));
+	scene_set_lights(sc, root->children);
 	// printf("Root node found!\nName: %s\nAttr0: %s=%s\n\n", root->name, root->properties->name, root->properties->children->content);
 	recurs(root, 0);
 	return(sc);

@@ -32,9 +32,9 @@ t_vec	parse_vec(char *s)
 
 t_color	parse_color(char *s)
 {
-	t_color res;
-	int		color;
-	int		color_tmp;
+	t_color 		res;
+	unsigned int	color;
+	unsigned int	color_tmp;
 
 	color = abs(ft_atoi_base(s, 16));
 	color_tmp = color;

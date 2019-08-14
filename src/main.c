@@ -19,6 +19,7 @@ void	set_ray_arr(t_scene *sc)
 	int		y;
 	float	x1;
 	float	y1;
+
 	fov = /*(WIDTH / 960) */ (M_PI / 2);
 	y = 0;
 	while (y < HEIGHT)
@@ -49,7 +50,7 @@ int		main(int ac, char **av)
 	if (ac == 2)
 	{
 		sc = parser(av[1]);
-		 set_ray_arr(sc);
+		set_ray_arr(sc);
 		// ray_trace(sc);
 	}
 	else

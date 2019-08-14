@@ -28,11 +28,15 @@ void	set_scene_atr(t_scene *sc, xmlNodePtr root)
 			sc->width = ft_atoi((char *)attr->children->content);
 		else if (ft_strequ((char *)attr->name, "height"))
 			sc->height = ft_atoi((char *)attr->children->content);
+		else if (ft_strequ((char *)attr->name, "ambient"))
+			sc->ambient = ft_atoi((char *)attr->children->content);
+		else if (ft_strequ((char *)attr->name, "max_reflections"))
+			sc->max_reflections = ft_atoi((char *)attr->children->content);
 		attr = attr->next;
 	}
 	if (sc->width > 2500 || sc->height > 1500)
 		ft_err("Too big window size", 1);
-	printf("Name: %s, Width: %d, height: %d\n", sc->name, sc->width, sc->height);
+	printf("Name: %s, Width: %d, height: %d, max_reflections: %d, ambient: %f\n", sc->name, sc->width, sc->height, sc->max_reflections, sc->ambient);
 }
 
 int		count_lights(xmlNodePtr cur)
@@ -58,7 +62,7 @@ void	scene_memory_alloc(t_scene *sc, xmlNodePtr root)
 	obj_count = xmlChildElementCount(root) - light_count;
 	// sc = (t_scene *)ft_memalloc(sizeof(t_scene));
 	sc->objects = (t_obj *)ft_memalloc(sizeof(t_obj) * obj_count);
-	sc->light = (t_light *)ft_memalloc(sizeof(t_light) * light_count);
+	sc->lights = (t_light *)ft_memalloc(sizeof(t_light) * light_count);
 	set_scene_atr(sc, root);
 	sc->ray_arr = (t_ray *)ft_memalloc(sizeof(t_ray) * sc->width * sc->height);
 }
