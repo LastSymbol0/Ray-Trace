@@ -23,6 +23,8 @@
 # define HEIGHT sc->height
 # define RAY_ARR sc->ray_arr
 
+# define MAX_OBJ_COUNT 50
+
 enum			e_typeobject
 {
 	CAM,
@@ -116,6 +118,7 @@ void	scene_set_lights(t_scene *sc, xmlNodePtr cur);
 /*
 ** utils.c
 */
+void	pixel_put(int color);
 void	ft_err(char *err, int status);
 void	set_tabs(int n);
 int		arr_len(char **arr);

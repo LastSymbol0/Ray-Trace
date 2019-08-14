@@ -38,10 +38,40 @@ void	set_ray_arr(t_scene *sc)
 	}	
 }
 
-// void	ray_trace(t_scene *sc)
-// {
+/*
+**	Returns -1 if it's no intersection, and color in any other case
+*/
+int		cast_ray(t_scene *sc, t_ray ray, int limit)
+{
+	// int	i;
 
-// }
+	// i = -1;
+	// while (sc->objects[++i])
+	// {
+		
+	// }
+	
+	// printf("%d\n", limit);
+	if (sc == NULL || limit)
+		return (ray.orig.x);
+	return (limit);
+}
+
+void	ray_trace(t_scene *sc)
+{
+	int	x;
+	int	y;
+
+	y = -1;
+	while(++y < HEIGHT)
+	{
+		x = -1;
+		while(++x < WIDTH)
+		{
+			pixel_put(cast_ray(sc, RAY_ARR[x + y * WIDTH], pow(2, 32)));
+		}
+	}
+}
 
 int		main(int ac, char **av)
 {
@@ -51,7 +81,7 @@ int		main(int ac, char **av)
 	{
 		sc = parser(av[1]);
 		set_ray_arr(sc);
-		// ray_trace(sc);
+		ray_trace(sc);
 	}
 	else
 		write(1, "1 argument plz\n", 15);

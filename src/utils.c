@@ -12,6 +12,13 @@
 
 #include "RT.h"
 
+
+void	pixel_put(int color)
+{
+	if (color < 0)
+		color = 0;
+}
+
 void	ft_err(char *err, int status)
 {
 	if (status == 1)
