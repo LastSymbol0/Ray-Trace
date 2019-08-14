@@ -16,6 +16,7 @@
 # include "libft/libft.h"
 # include "libxml2/libxml/parser.h"
 # include "libxml2/libxml/tree.h"
+# include <SDL2/SDL.h>
 # include <stdio.h>
 # include <math.h>
 
@@ -70,8 +71,20 @@ typedef struct	s_obj
 	int			type;
 }				t_obj;
 
+typedef struct	s_SDL
+{
+	SDL_Window		*window;
+	SDL_Renderer	*render;
+	SDL_Surface		*surface;
+	SDL_Texture		*texture;
+	SDL_Event		event;
+	Uint32			*pixel;
+}				t_SDL;
+
+
 typedef struct	s_scene
 {
+	t_SDL		*sdl;
 	t_obj		cam;
 	float		ambient;
 	int			max_reflections;
@@ -87,6 +100,13 @@ typedef struct	s_scene
 }				t_scene;
 
 int			ft_atoi_base(char *str, int base);
+
+
+t_SDL	*sdl_init(t_scene *sc);
+void	sdl_draw(t_scene *sc);
+void	sdl_destroy(t_scene *sc);
+void	sdl_put_pixel(t_scene *sc, int x, int y, int color);
+
 
 
 /*
