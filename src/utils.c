@@ -45,3 +45,15 @@ int		arr_len(char **arr)
 		i++;
 	return (i);
 }
+
+char	*read_file(char *filename, size_t file_size)
+{
+	int		fd;
+	char	*res;
+
+	fd = open(filename, O_RDONLY);
+	printf("filename:%s; fd:%d\n", filename, fd);
+	res = ft_strnew(file_size);
+	read(fd, res, file_size);
+	return (res);
+}

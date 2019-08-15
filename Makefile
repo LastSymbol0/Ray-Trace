@@ -11,6 +11,8 @@ SDL_MIXER= -I ~/Library/Frameworks/SDL2_mixer.framework/Versions/A/Headers -F ~/
 
 SDL= -I ~/Library/Frameworks/SDL2.framework/Versions/A/Headers -F ~/Library/Frameworks/ -framework SDL2 $(SDL_IMAGE) $(SDL_TTF) $(SDL_MIXER)
 
+OpenCL= -framework OpenCL
+
 LIB_XML= -I /usr/include/libxml2/ -lxml2 
 
 OBJ=$(SRC:%.c=%.o)
@@ -23,7 +25,7 @@ all: $(NAME)
 
 $(NAME): 
 	@make -C ./libft/
-	@gcc -g -o $(NAME) $(SRC) $(FLAGS) $(INCL) $(LIB_XML) $(SDL)
+	@gcc -g -o $(NAME) $(SRC) $(FLAGS) $(INCL) $(LIB_XML) $(SDL) $(OpenCL)
 	@echo "\x1b[32m Success build"
 
 clean:

@@ -17,12 +17,17 @@
 # include "libxml2/libxml/parser.h"
 # include "libxml2/libxml/tree.h"
 # include <SDL2/SDL.h>
+# include <OpenCL/opencl.h>
 # include <stdio.h>
+# include <unistd.h>
+# include <fcntl.h>
 # include <math.h>
 
 # define WIDTH sc->width
 # define HEIGHT sc->height
 # define RAY_ARR sc->ray_arr
+# define OCL sc->ocl
+# define CL_SUCCES 0
 
 # define MAX_OBJ_COUNT 50
 
@@ -71,20 +76,39 @@ typedef struct	s_obj
 	int			type;
 }				t_obj;
 
-typedef struct	s_SDL
+typedef struct			s_SDL
 {
-	SDL_Window		*window;
-	SDL_Renderer	*render;
-	SDL_Surface		*surface;
-	SDL_Texture		*texture;
-	SDL_Event		event;
-	Uint32			*pixel;
-}				t_SDL;
+	SDL_Window			*window;
+	SDL_Renderer		*render;
+	SDL_Surface			*surface;
+	SDL_Texture			*texture;
+	SDL_Event			event;
+	Uint32				*pixel;
+}						t_SDL;
+
+typedef struct			s_OpenCL
+{
+	cl_int				err;     // error code returned from api calls
+
+	size_t				global;  // global domain size for our calculation
+	size_t				local;   // local domain size for our calculation
+
+	cl_platform_id		Platform; // OpenCL platform
+	cl_device_id		device_id;    // compute device id
+	cl_context			context;        // compute context
+	cl_command_queue	commands; // compute command queue
+	cl_program			program;        // compute program
+	cl_kernel			kernel;          // compute kernel
+
+	cl_mem				output;
+}						t_OpenCL;
 
 
 typedef struct	s_scene
 {
 	t_SDL		*sdl;
+	t_OpenCL	*ocl;
+
 	t_obj		cam;
 	float		ambient;
 	int			max_reflections;
@@ -106,6 +130,8 @@ t_SDL	*sdl_init(t_scene *sc);
 void	sdl_draw(t_scene *sc);
 void	sdl_destroy(t_scene *sc);
 void	sdl_put_pixel(t_scene *sc, int x, int y, int color);
+
+void	test_openCL(t_scene *sc);
 
 
 
@@ -142,6 +168,7 @@ void	pixel_put(int color);
 void	ft_err(char *err, int status);
 void	set_tabs(int n);
 int		arr_len(char **arr);
+char	*read_file(char *filename, size_t file_size);
 
 /*
 ** vec.c & vec2.c

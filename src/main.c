@@ -75,6 +75,7 @@ void	set_ray_arr(t_scene *sc)
 // }
 
 
+
 int		main(int ac, char **av)
 {
 	t_scene *sc;
@@ -84,8 +85,7 @@ int		main(int ac, char **av)
 		sc = parser(av[1]);
 		sc->sdl = sdl_init(sc);
 		test_sdl(sc);
-
-
+		test_openCL(sc);
 		set_ray_arr(sc);
 		// ray_trace(sc);
 	}
