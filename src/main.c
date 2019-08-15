@@ -74,6 +74,7 @@ void	set_ray_arr(t_scene *sc)
 	// }
 // }
 
+
 int		main(int ac, char **av)
 {
 	t_scene *sc;
@@ -82,17 +83,7 @@ int		main(int ac, char **av)
 	{
 		sc = parser(av[1]);
 		sc->sdl = sdl_init(sc);
-
-		int	x;
-		int	y;
-
-		y = -1;
-		while(++y < HEIGHT)
-		{
-			x = -1;
-			while(++x < WIDTH)
-				sdl_put_pixel(sc, x, y, 1233454);
-		}
+		test_sdl(sc);
 
 
 		set_ray_arr(sc);

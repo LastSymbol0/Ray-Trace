@@ -2,17 +2,28 @@ NAME=RT
 
 SRC=./src/parser/*.c ./src/vec/*.c ./src/*.c ./libft/libft.a
 
+
+SDL_IMAGE = -I ~/Library/Frameworks/SDL2_image.framework/Versions/A/Headers -F ~/Library/Frameworks/ -framework SDL2_image
+
+SDL_TTF=-I ~/Library/Frameworks/SDL2_ttf.framework/Versions/A/Headers -F ~/Library/Frameworks/ -framework SDL2_ttf
+
+SDL_MIXER= -I ~/Library/Frameworks/SDL2_mixer.framework/Versions/A/Headers -F ~/Library/Frameworks/ -framework SDL2_mixer
+
+SDL= -I ~/Library/Frameworks/SDL2.framework/Versions/A/Headers -F ~/Library/Frameworks/ -framework SDL2 $(SDL_IMAGE) $(SDL_TTF) $(SDL_MIXER)
+
+LIB_XML= -I /usr/include/libxml2/ -lxml2 
+
 OBJ=$(SRC:%.c=%.o)
 
 FLAGS= -Wall -Wextra -Werror
 
-INCL=-I ./ -I /usr/include/libxml2/
+INCL=-I ./ 
 	
 all: $(NAME)
 
 $(NAME): 
 	@make -C ./libft/
-	@gcc -g -o $(NAME) $(SRC) $(FLAGS) $(INCL) -lxml2
+	@gcc -g -o $(NAME) $(SRC) $(FLAGS) $(INCL) $(LIB_XML) $(SDL)
 	@echo "\x1b[32m Success build"
 
 clean:

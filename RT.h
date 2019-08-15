@@ -101,7 +101,7 @@ typedef struct	s_scene
 
 int			ft_atoi_base(char *str, int base);
 
-
+void	test_sdl(t_scene *sc);
 t_SDL	*sdl_init(t_scene *sc);
 void	sdl_draw(t_scene *sc);
 void	sdl_destroy(t_scene *sc);
