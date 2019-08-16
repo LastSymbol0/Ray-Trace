@@ -100,7 +100,7 @@ typedef struct			s_OpenCL
 	cl_program			program;        // compute program
 	cl_kernel			kernel;          // compute kernel
 
-	cl_mem				output;
+	cl_mem				output[224][142];
 }						t_OpenCL;
 
 

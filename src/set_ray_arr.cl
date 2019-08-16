@@ -5,12 +5,6 @@ typedef struct	s_vec
 	float		z;
 }				t_vec;
 
-typedef struct	s_ray
-{
-	t_vec		orig;
-	t_vec		dir;
-}				t_ray;
-
 t_vec	v_add(t_vec v1, t_vec v2);
 t_vec	v_scale(t_vec v, float n);
 t_vec	v_norm(t_vec v);
@@ -55,29 +49,15 @@ t_vec	v_add(t_vec v1, t_vec v2)
 	return (v);
 }
 
-__kernel void	set_ray_arr(int width, int height, t_vec cam_rot, __global t_ray *ray_arr)
+__kernel void	set_ray_arr(int x, int y, t_vec cam_rot, __global t_vec *dir)
 {
 	float	fov;
-	int		x;
-	int		y;
 	float	x1;
 	float	y1;
 
-	fov = (width / 960) * (M_PI / 2);
-	y = 0;
-	while (y < height)
-	{
-		x = 0;
-		while (x < width)
-		{
-			x1 = (2 * (x + 0.5) / (float)width - 1) * tan(fov / 2) *
-							(float)width / (float)height;
-			y1 = -(2 * (y + 0.5) / (float)height - 1) * tan(fov / 2);
-			ray_arr[x + y * width].dir.x = x1;
-			ray_arr[x + y * width].dir.y = y1;
-			x++;
-		}
-		y++;
-	}	
+	fov = M_PI_2_F;
+	x1 = (2 * (x + 0.5) / (float)24 - 1) * tan(fov / 2) * (float)24 / (float)42;
+	y1 = -(2 * (y + 0.5) / (float)42 - 1) * tan(fov / 2);
+	*dir = v_norm(v_add(v_new(x1, y1, 0), cam_rot));
 }
 
