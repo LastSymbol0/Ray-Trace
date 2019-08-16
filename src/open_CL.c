@@ -66,7 +66,7 @@ void	build_cl_source(t_scene *sc, char *KernelSource)
 		ft_err("Failed to create compute kernel", 1);
 }
 
-void	set_cl_params(t_scene *sc, int x, int y)
+void	set_cl_params(t_scene *sc, int *x, int *y)
 {
 	// t_ray* results = RAY_ARR; // results returned from device
 	// unsigned int correct;               // number of correct results returned
@@ -83,21 +83,21 @@ void	set_cl_params(t_scene *sc, int x, int y)
 			sizeof(int), NULL, &OCL->err);
 	input3 = clCreateBuffer(OCL->context,  CL_MEM_READ_ONLY,
 			sizeof(t_vec), NULL, &OCL->err);
-	OCL->output[x][y] = clCreateBuffer(OCL->context, CL_MEM_WRITE_ONLY,
-			sizeof(t_vec), NULL, &OCL->err);
-	if (!OCL->output[x][y] || OCL->err != CL_SUCCES) 
+	OCL->output[*x][*y] = clCreateBuffer(OCL->context, CL_MEM_WRITE_ONLY,
+			sizeof(t_vec) * 2, NULL, &OCL->err);
+	if (!OCL->output[*x][*y] || OCL->err != CL_SUCCES) 
 		ft_err("Failed to allocate device memory", 1);
 
 	// Transfer the input vector into device memory
 	OCL->err = clEnqueueWriteBuffer(OCL->commands, input1,
 			     CL_TRUE, 0, sizeof(int),
-			    &x, 0, NULL, NULL);
+			    x, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array", 1);
 
 	OCL->err = clEnqueueWriteBuffer(OCL->commands, input2,
 			     CL_TRUE, 0, sizeof(int),
-			    &y, 0, NULL, NULL);
+			    y, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array", 1);
 	OCL->err = clEnqueueWriteBuffer(OCL->commands, input3,
@@ -105,9 +105,9 @@ void	set_cl_params(t_scene *sc, int x, int y)
 			    &sc->cam.rot, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array", 1);
-	OCL->err = clEnqueueWriteBuffer(OCL->commands, OCL->output[x][y],
-			     CL_TRUE, 0, sizeof(t_vec),
-			    &RAY_ARR[x + y * WIDTH], 0, NULL, NULL);
+	// OCL->err = clEnqueueWriteBuffer(OCL->commands, OCL->output[x][y],
+	// 		     CL_TRUE, 0, sizeof(t_vec),
+	// 		    &RAY_ARR[x + y * WIDTH], 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array", 1);
 	
@@ -124,7 +124,7 @@ void	set_cl_params(t_scene *sc, int x, int y)
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
 
-			OCL->err  = clSetKernelArg(OCL->kernel, 3, sizeof(cl_mem), &OCL->output[x][y]);
+			OCL->err  = clSetKernelArg(OCL->kernel, 3, sizeof(cl_mem), &OCL->output[*x][*y]);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
 
@@ -139,6 +139,8 @@ void	set_cl_params(t_scene *sc, int x, int y)
 void	test_openCL(t_scene *sc)
 {
 	char *KernelSource;
+	int x = 5, y =5;
+	// int y;
 
 	OCL = init_ocl();
 	KernelSource = read_file("src/set_ray_arr.cl", 5508);
@@ -146,7 +148,7 @@ void	test_openCL(t_scene *sc)
 	build_cl_source(sc, KernelSource);
 
 
-			set_cl_params(sc, 0, 0);
+			set_cl_params(sc, &x, &y);
 			OCL->global = 1024;
 			// size_t global_work_size[2];
 			// global_work_size[0] = sc->height;
@@ -158,13 +160,13 @@ void	test_openCL(t_scene *sc)
 
 	clFinish(OCL->commands);
 
-	t_vec vec;
+	t_vec vec[2];
 
 				  // Read back the results from the device to verify the output
 			//
-			OCL->err = clEnqueueReadBuffer(OCL->commands, OCL->output[0][0],
-						    CL_TRUE, 0, sizeof(t_ray) * sc->width * sc->height,
-						    &vec, 0, NULL, NULL );
+			OCL->err = clEnqueueReadBuffer(OCL->commands, OCL->output[x][y],
+						    CL_TRUE, 0, sizeof(t_vec) * 2,
+						    vec, 0, NULL, NULL );
 			if (OCL->err != CL_SUCCESS)
 				ft_err("Failed to read output array", 1);
 

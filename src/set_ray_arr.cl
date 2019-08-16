@@ -49,15 +49,17 @@ t_vec	v_add(t_vec v1, t_vec v2)
 	return (v);
 }
 
-__kernel void	set_ray_arr(int x, int y, t_vec cam_rot, __global t_vec *dir)
+__kernel void	set_ray_arr(__global int *x, __global int *y, __global t_vec *cam_rot, __global t_vec *dir)
 {
-	float	fov;
-	float	x1;
-	float	y1;
+	__local float	fov;
+	__local float	x1;
+	__local float	y1;
 
 	fov = M_PI_2_F;
-	x1 = (2 * (x + 0.5) / (float)24 - 1) * tan(fov / 2) * (float)24 / (float)42;
-	y1 = -(2 * (y + 0.5) / (float)42 - 1) * tan(fov / 2);
-	*dir = v_norm(v_add(v_new(x1, y1, 0), cam_rot));
+	x1 = (2 * (*x + 0.5) / (float)24 - 1) * tan(fov / 2) * (float)24 / (float)42;
+	y1 = -(2 * (*y + 0.5) / (float)42 - 1) * tan(fov / 2);
+	*dir = v_norm(v_add(v_new(x1, y1, 0), *cam_rot));
+	dir[1].x = *x;
+	dir[1].y = *y;
 }
 
