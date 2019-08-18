@@ -22,6 +22,8 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <math.h>
+# include <time.h>
+
 
 # define WIDTH sc->width
 # define HEIGHT sc->height
@@ -100,7 +102,7 @@ typedef struct			s_OpenCL
 	cl_program			program;        // compute program
 	cl_kernel			kernel;          // compute kernel
 
-	cl_mem				output[224][142];
+	cl_mem				*output;
 }						t_OpenCL;
 
 

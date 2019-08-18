@@ -86,7 +86,11 @@ int		main(int ac, char **av)
 		sc->sdl = sdl_init(sc);
 		test_sdl(sc);
 		test_openCL(sc);
+	clock_t end, start;
+	start = clock();
 		set_ray_arr(sc);
+	end = clock();
+	printf("CPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
 		// ray_trace(sc);
 	}
 	else
