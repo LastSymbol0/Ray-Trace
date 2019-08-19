@@ -14,9 +14,9 @@
 
 void	test_sdl(t_scene *sc)
 {
-		int	x;
-		int	y;
-		int running;
+	int	x;
+	int	y;
+	int running;
 
 	running = 1;
 	y = -1;
@@ -66,5 +66,5 @@ void	sdl_destroy(t_scene *sc)
 
 void	sdl_put_pixel(t_scene *sc, int x, int y, int color)
 {
-	sc->sdl->pixel[y * WIDTH + x] = color;
+	sc->sdl->pixel[y * WIDTH + x] = color < 0 ? 0 : color;
 }

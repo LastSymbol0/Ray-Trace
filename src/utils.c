@@ -55,5 +55,6 @@ char	*read_file(char *filename, size_t file_size)
 	printf("filename:%s; fd:%d\n", filename, fd);
 	res = ft_strnew(file_size);
 	read(fd, res, file_size);
+	close(fd);
 	return (res);
 }

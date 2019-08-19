@@ -55,16 +55,13 @@ int		count_lights(xmlNodePtr cur)
 
 void	scene_memory_alloc(t_scene *sc, xmlNodePtr root)
 {
-	int	obj_count;
-	int	light_count;
-
-	light_count = count_lights(root->children);
-	obj_count = xmlChildElementCount(root) - light_count;
-	if (obj_count > MAX_OBJ_COUNT)
+	sc->light_count = count_lights(root->children);
+	sc->obj_count = xmlChildElementCount(root) - sc->light_count;
+	if (sc->obj_count > MAX_OBJ_COUNT)
 		ft_err("Too much objects", 1);	
 	// sc = (t_scene *)ft_memalloc(sizeof(t_scene));
-	sc->objects = (t_obj *)ft_memalloc(sizeof(t_obj) * (obj_count + 1));
-	sc->lights = (t_light *)ft_memalloc(sizeof(t_light) * (light_count + 1));
+	sc->objects = (t_obj *)ft_memalloc(sizeof(t_obj) * (sc->obj_count));
+	sc->lights = (t_light *)ft_memalloc(sizeof(t_light) * (sc->light_count + 1));
 	set_scene_atr(sc, root);
 	sc->ray_arr = (t_ray *)ft_memalloc(sizeof(t_ray) * sc->width * sc->height);
 }

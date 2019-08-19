@@ -39,69 +39,93 @@ t_OpenCL	*init_ocl(void)
 	return(ocl);
 }
 
-void	build_cl_source(t_scene *sc, char *KernelSource)
+void	object_intersect_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName)
 {
 	// Create the compute program from the source buffer
-	OCL->program = clCreateProgramWithSource(OCL->context, 1,
+	OCL->object_intersect_program = clCreateProgramWithSource(OCL->context, 1,
 	(const char **) &KernelSource, NULL, &OCL->err);
-	if (!OCL->program)
+	if (!OCL->object_intersect_program)
 	  ft_err("Failed to create compute program", 1);
 
 	// Build the program executable
-	OCL->err = clBuildProgram(OCL->program, 0, NULL, NULL, NULL, NULL);
+	OCL->err = clBuildProgram(OCL->object_intersect_program, 0, NULL, NULL, NULL, NULL);
 	if (OCL->err != CL_SUCCESS) {
 	  size_t len;
-	  char buffer[12048];
+	  char buffer[120048];
 
 	  ft_putendl("Failed to build program executable");
-	  clGetProgramBuildInfo(OCL->program, OCL->device_id, CL_PROGRAM_BUILD_LOG,
+	  clGetProgramBuildInfo(OCL->object_intersect_program, OCL->device_id, CL_PROGRAM_BUILD_LOG,
 				  sizeof(buffer), buffer, &len);
 	  ft_err(buffer, 1);
 	  exit(1);
 	}
 
 	// Create the compute kernel in the program
-	OCL->kernel = clCreateKernel(OCL->program, "set_ray_arr", &OCL->err);
-	if (!OCL->kernel || OCL->err != CL_SUCCESS)
+	OCL->object_intersect_kernel = clCreateKernel(OCL->object_intersect_program, KernelName, &OCL->err);
+	if (!OCL->object_intersect_kernel || OCL->err != CL_SUCCESS)
 		ft_err("Failed to create compute kernel", 1);
 }
 
-void	test_openCL(t_scene *sc)
+void	ray_arr_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName)
+{
+	// Create the compute program from the source buffer
+	OCL->ray_arr_program = clCreateProgramWithSource(OCL->context, 1,
+	(const char **) &KernelSource, NULL, &OCL->err);
+	if (!OCL->ray_arr_program)
+	  ft_err("Failed to create compute program", 1);
+
+	// Build the program executable
+	OCL->err = clBuildProgram(OCL->ray_arr_program, 0, NULL, NULL, NULL, NULL);
+	if (OCL->err != CL_SUCCESS) {
+	  size_t len;
+	  char buffer[12048];
+
+	  ft_putendl("Failed to build program executable");
+	  clGetProgramBuildInfo(OCL->ray_arr_program, OCL->device_id, CL_PROGRAM_BUILD_LOG,
+				  sizeof(buffer), buffer, &len);
+	  ft_err(buffer, 1);
+	  exit(1);
+	}
+
+	// Create the compute kernel in the program
+	OCL->ray_arr_kernel = clCreateKernel(OCL->ray_arr_program, KernelName, &OCL->err);
+	if (!OCL->ray_arr_kernel || OCL->err != CL_SUCCESS)
+		ft_err("Failed to create compute kernel", 1);
+}
+
+void	set_ray_arr_ocl(t_scene *sc)
 {
 	char	*KernelSource;
 	cl_mem	output;
-	t_vec	*results;
-
-	results = (t_vec *)ft_memalloc(sizeof(t_vec) * WIDTH * HEIGHT);
-
-	clock_t end, start;
-	start = clock();
-	OCL = init_ocl();
+	
 	KernelSource = read_file("src/set_ray_arr.cl", 5508);
 	printf("\nKernelSource:\n%s\n", KernelSource);
-	build_cl_source(sc, KernelSource);
+	ray_arr_build_ocl_source(sc, KernelSource, "set_ray_arr");
 	output = clCreateBuffer(OCL->context, CL_MEM_WRITE_ONLY,
-			sizeof(t_vec) * WIDTH * HEIGHT, NULL, &OCL->err);
+			sizeof(t_ray) * WIDTH * HEIGHT, NULL, &OCL->err);
 	if (!output || OCL->err != CL_SUCCES) 
 		ft_err("Failed to allocate device memory", 1);
 
-	OCL->err  = clSetKernelArg(OCL->kernel, 0, sizeof(int), &HEIGHT);
+	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 0, sizeof(int), &HEIGHT);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
-	OCL->err  = clSetKernelArg(OCL->kernel, 1, sizeof(int), &WIDTH);
+	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 1, sizeof(int), &WIDTH);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
-	OCL->err  = clSetKernelArg(OCL->kernel, 2, sizeof(t_vec), &sc->cam.rot);
+	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 2, sizeof(t_vec), &sc->cam.pos);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
-	OCL->err  = clSetKernelArg(OCL->kernel, 3, sizeof(cl_mem), &output);
+	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 3, sizeof(t_vec), &sc->cam.rot);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments", 1);
+	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 4, sizeof(cl_mem), &output);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
 
 	OCL->global = HEIGHT * WIDTH;
-	OCL->local = 100;
+	OCL->local = 1;
 
-	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->kernel,
+	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->ray_arr_kernel,
 			       1, NULL, &OCL->global, &OCL->local,
 			       0, NULL, NULL);
 
@@ -109,10 +133,8 @@ void	test_openCL(t_scene *sc)
 	clFinish(OCL->commands);
 	// Read back the results from the device to verify the output
 	OCL->err = clEnqueueReadBuffer(OCL->commands, output,
-				    CL_TRUE, 0, sizeof(t_vec) * WIDTH * HEIGHT,
-				    results, 0, NULL, NULL );
-	end = clock();
-	printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
+				    CL_TRUE, 0, sizeof(t_ray) * WIDTH * HEIGHT,
+				    RAY_ARR, 0, NULL, NULL );
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to read output array", 1);
 

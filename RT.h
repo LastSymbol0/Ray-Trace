@@ -76,6 +76,8 @@ typedef struct	s_obj
 	int			radius;
 	t_color		color;
 	int			type;
+
+	float		t;
 }				t_obj;
 
 typedef struct			s_SDL
@@ -99,8 +101,10 @@ typedef struct			s_OpenCL
 	cl_device_id		device_id;    // compute device id
 	cl_context			context;        // compute context
 	cl_command_queue	commands; // compute command queue
-	cl_program			program;        // compute program
-	cl_kernel			kernel;          // compute kernel
+	cl_program			ray_arr_program;        // compute program
+	cl_program			object_intersect_program;        // compute program
+	cl_kernel			ray_arr_kernel;          // compute kernel
+	cl_kernel			object_intersect_kernel;          // compute kernel
 
 	cl_mem				*output;
 }						t_OpenCL;
@@ -115,8 +119,10 @@ typedef struct	s_scene
 	float		ambient;
 	int			max_reflections;
 
-	t_ray		*ray_arr;
+	int			obj_count;
+	int			light_count;
 
+	t_ray		*ray_arr;
 	t_obj		*objects;
 	t_light		*lights;
 
@@ -127,13 +133,18 @@ typedef struct	s_scene
 
 int			ft_atoi_base(char *str, int base);
 
-void	test_sdl(t_scene *sc);
-t_SDL	*sdl_init(t_scene *sc);
-void	sdl_draw(t_scene *sc);
-void	sdl_destroy(t_scene *sc);
-void	sdl_put_pixel(t_scene *sc, int x, int y, int color);
+void		test_sdl(t_scene *sc);
+t_SDL		*sdl_init(t_scene *sc);
+void		sdl_draw(t_scene *sc);
+void		sdl_destroy(t_scene *sc);
+void		sdl_put_pixel(t_scene *sc, int x, int y, int color);
 
-void	test_openCL(t_scene *sc);
+t_OpenCL	*init_ocl(void);
+void		set_ray_arr_ocl(t_scene *sc);
+void		ray_arr_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);
+void		object_intersect_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);
+
+
 
 
 

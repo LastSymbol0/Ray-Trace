@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<scene name="somefuckingnicescenename" width="2500" height="1442" ambient="20" max_reflections="4">
+<scene name="somefuckingnicescenename" width="250" height="140" ambient="20" max_reflections="4">
 
 	<cam>
-		<pos> 2,0,0</pos>
-		<rot> 0,4,4</rot>
+		<pos> 0,0,45</pos>
+		<rot> 0,0,-1</rot>
 	</cam>
+
+	<sphere>
+		<pos> 45,-30,5</pos>
+		<radius> 15 </radius>
+		<color> 00dfaf </color>
+	</sphere>
+
+	<sphere>
+		<pos> -45,30,5</pos>
+		<radius> 15 </radius>
+		<color> 00dfaf </color>
+	</sphere>
 
 	<cylinder reflection_intens="60">
 		<pos> 0,0,0</pos>
-		<rot> 0,4,4</rot>
-		<radius> 5 </radius>
+		<rot> 0,1,0</rot>
+		<radius> 13 </radius>
 		<color> ff00ff </color>
 	</cylinder>
 

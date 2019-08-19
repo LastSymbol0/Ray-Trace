@@ -41,57 +41,128 @@ void	set_ray_arr(t_scene *sc)
 // /*
 // **	Returns -1 if it's no intersection, and color in any other case
 // */
-// t_obj	cast_ray(t_scene *sc, t_ray ray, int limit)
-// {
-// 	int t;
-// 	int	i;
-// 	t_obj obj;
-// 	t_obj tmp;
+t_obj	*cast_ray(t_scene *sc, t_ray ray, int limit)
+{
+	int t;
+	int	i;
+	t_obj *obj;
+	cl_mem	objects;
 
-// 	i = -1;
-// 	t = limit;
-// 	while (sc->objects[++i])
-// 	{
-// 		if ((tmp = intersect(sc->objects[i], ray, &t)) != NULL)
-// 			obj = tmp;
-// 	}
-// 	return (t == limit ? NULL : obj);
-// }
+	i = -1;
+	t = limit;
+	objects = clCreateBuffer(OCL->context, CL_MEM_READ_WRITE,
+			sizeof(t_obj) * (sc->obj_count), NULL, &OCL->err);
+	if (!objects || OCL->err != CL_SUCCES) 
+		ft_err("Failed to allocate device memory", 1);
 
-// void	ray_trace(t_scene *sc)
-// {
-	// int	x;
-	// int	y;
+	// Transfer the input into device memory
+	OCL->err = clEnqueueWriteBuffer(OCL->commands, objects, CL_TRUE, 0,
+			sizeof(t_obj) * (sc->obj_count), sc->objects, 0, NULL, NULL);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to write to source array (obj)", 1);
 
-	// y = -1;
-	// while(++y < HEIGHT)
-	// {
-	// 	x = -1;
-	// 	while(++x < WIDTH)
-	// 	{
-	// 		cast_ray(sc, RAY_ARR[x + y * WIDTH], pow(2, 32));
-	// 	}
-	// }
-// }
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 0, sizeof(t_ray), &ray);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments1", 1);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 1, sizeof(cl_mem), &objects);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
+
+	OCL->global = sc->obj_count;
+	OCL->local = 1;
+	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->object_intersect_kernel,
+			       1, NULL, &OCL->global, &OCL->local,
+			       0, NULL, NULL);
+
+
+	clFinish(OCL->commands);
+	// Read back the results from the device to verify the output
+	OCL->err = clEnqueueReadBuffer(OCL->commands, objects,
+				    CL_TRUE, 0, sizeof(t_obj) * (sc->obj_count),
+				    sc->objects, 0, NULL, NULL );
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to read output array", 1);
+
+	obj = (t_obj *)ft_memalloc(sizeof(t_obj));
+	while (++i < sc->obj_count)
+	{
+		if (sc->objects[i].t < t && sc->objects[i].t > 0)
+			*obj = sc->objects[i];
+	}
+	return (obj);
+}
+
+int		get_color(t_obj *obj)
+{
+	int	color;
+
+	if (!obj)
+		return (0);
+	
+	color = 0;
+	color += obj->color.blue;
+	color += obj->color.green * 255;
+	color += obj->color.red  * 255  * 255;
+	return (color);
+}
+
+void	ray_trace(t_scene *sc)
+{
+	int	x;
+	int	y;
+	int running;
+
+	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "object_intersect");
+	running = 1;
+	y = -1;
+	while(++y < HEIGHT)
+	{
+		x = -1;
+		while(++x < WIDTH)
+		{
+			sdl_put_pixel(sc, x, y, get_color(cast_ray(sc, RAY_ARR[x + y * WIDTH], pow(2, 16))));
+		}
+	}
+	sdl_draw(sc);
+	
+	while (running)
+		while(!SDL_PollEvent (&sc->sdl->event))
+			if (SDL_QUIT == sc->sdl->event.type || SDL_SCANCODE_ESCAPE == sc->sdl->event.key.keysym.scancode)
+				running = 0;
+	sdl_destroy(sc);
+}
+
+
+
+
 
 
 
 int		main(int ac, char **av)
 {
 	t_scene *sc;
+	clock_t end, start;
 
 	if (ac == 2)
 	{
 		sc = parser(av[1]);
 		sc->sdl = sdl_init(sc);
-		test_sdl(sc);
-		test_openCL(sc);
-	clock_t end, start;
+		// test_sdl(sc);
+		OCL = init_ocl();
+
+
+	start = clock();
+		set_ray_arr_ocl(sc);
+	end = clock();
+	printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
+
 	start = clock();
 		set_ray_arr(sc);
 	end = clock();
 	printf("CPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
-		// ray_trace(sc);
+
+
+	ray_trace(sc);
 	}
 	else
 		write(1, "1 argument plz\n", 15);
