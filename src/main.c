@@ -41,56 +41,56 @@ void	set_ray_arr(t_scene *sc)
 // /*
 // **	Returns -1 if it's no intersection, and color in any other case
 // */
-t_obj	*cast_ray(t_scene *sc, t_ray ray, int limit)
-{
-	int t;
-	int	i;
-	t_obj *obj;
-	cl_mem	objects;
+// t_obj	*cast_ray(t_scene *sc, t_ray ray, int limit)
+// {
+// 	int t;
+// 	int	i;
+// 	t_obj *obj;
+// 	cl_mem	objects;
 
-	i = -1;
-	t = limit;
-	objects = clCreateBuffer(OCL->context, CL_MEM_READ_WRITE,
-			sizeof(t_obj) * (sc->obj_count), NULL, &OCL->err);
-	if (!objects || OCL->err != CL_SUCCES) 
-		ft_err("Failed to allocate device memory", 1);
+// 	i = -1;
+// 	t = limit;
+// 	objects = clCreateBuffer(OCL->context, CL_MEM_READ_WRITE,
+// 			sizeof(t_obj) * (sc->obj_count), NULL, &OCL->err);
+// 	if (!objects || OCL->err != CL_SUCCES) 
+// 		ft_err("Failed to allocate device memory", 1);
 
-	// Transfer the input into device memory
-	OCL->err = clEnqueueWriteBuffer(OCL->commands, objects, CL_TRUE, 0,
-			sizeof(t_obj) * (sc->obj_count), sc->objects, 0, NULL, NULL);
-	if (OCL->err != CL_SUCCESS)
-		ft_err("Failed to write to source array (obj)", 1);
+// 	// Transfer the input into device memory
+// 	OCL->err = clEnqueueWriteBuffer(OCL->commands, objects, CL_TRUE, 0,
+// 			sizeof(t_obj) * (sc->obj_count), sc->objects, 0, NULL, NULL);
+// 	if (OCL->err != CL_SUCCESS)
+// 		ft_err("Failed to write to source array (obj)", 1);
 
-	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 0, sizeof(t_ray), &ray);
-	if (OCL->err != CL_SUCCESS)
-		ft_err("Failed to set kernel arguments1", 1);
-	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 1, sizeof(cl_mem), &objects);
-	if (OCL->err != CL_SUCCESS)
-		ft_err("Failed to set kernel arguments2", 1);
+// 	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 0, sizeof(t_ray), &ray);
+// 	if (OCL->err != CL_SUCCESS)
+// 		ft_err("Failed to set kernel arguments1", 1);
+// 	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 1, sizeof(cl_mem), &objects);
+// 	if (OCL->err != CL_SUCCESS)
+// 		ft_err("Failed to set kernel arguments2", 1);
 
-	OCL->global = sc->obj_count;
-	OCL->local = 1;
-	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->object_intersect_kernel,
-			       1, NULL, &OCL->global, &OCL->local,
-			       0, NULL, NULL);
+// 	OCL->global = sc->obj_count;
+// 	OCL->local = 1;
+// 	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->object_intersect_kernel,
+// 			       1, NULL, &OCL->global, &OCL->local,
+// 			       0, NULL, NULL);
 
 
-	clFinish(OCL->commands);
-	// Read back the results from the device to verify the output
-	OCL->err = clEnqueueReadBuffer(OCL->commands, objects,
-				    CL_TRUE, 0, sizeof(t_obj) * (sc->obj_count),
-				    sc->objects, 0, NULL, NULL );
-	if (OCL->err != CL_SUCCESS)
-		ft_err("Failed to read output array", 1);
+// 	clFinish(OCL->commands);
+// 	// Read back the results from the device to verify the output
+// 	OCL->err = clEnqueueReadBuffer(OCL->commands, objects,
+// 				    CL_TRUE, 0, sizeof(t_obj) * (sc->obj_count),
+// 				    sc->objects, 0, NULL, NULL );
+// 	if (OCL->err != CL_SUCCESS)
+// 		ft_err("Failed to read output array", 1);
 
-	obj = (t_obj *)ft_memalloc(sizeof(t_obj));
-	while (++i < sc->obj_count)
-	{
-		if (sc->objects[i].t < t && sc->objects[i].t > 0)
-			*obj = sc->objects[i];
-	}
-	return (obj);
-}
+// 	obj = (t_obj *)ft_memalloc(sizeof(t_obj));
+// 	while (++i < sc->obj_count)
+// 	{
+// 		if (sc->objects[i].t < t && sc->objects[i].t > 0)
+// 			*obj = sc->objects[i];
+// 	}
+// 	return (obj);
+// }
 
 int		get_color(t_obj *obj)
 {
@@ -108,21 +108,67 @@ int		get_color(t_obj *obj)
 
 void	ray_trace(t_scene *sc)
 {
-	int	x;
-	int	y;
 	int running;
+	cl_mem	objects_buff;
+	cl_mem	ray_arr_buff;
+	cl_mem	pixels_buff;
 
-	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "object_intersect");
+	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "ray_cast");
 	running = 1;
-	y = -1;
-	while(++y < HEIGHT)
-	{
-		x = -1;
-		while(++x < WIDTH)
-		{
-			sdl_put_pixel(sc, x, y, get_color(cast_ray(sc, RAY_ARR[x + y * WIDTH], pow(2, 16))));
-		}
-	}
+
+
+	objects_buff = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY,
+			sizeof(t_obj) * (sc->obj_count), NULL, &OCL->err);
+	if (!objects_buff || OCL->err != CL_SUCCES) 
+		ft_err("Failed to allocate device memory", 1);
+	ray_arr_buff = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY,
+			sizeof(t_ray) * WIDTH * HEIGHT, NULL, &OCL->err);
+	if (!ray_arr_buff || OCL->err != CL_SUCCES) 
+		ft_err("Failed to allocate device memory", 1);
+	pixels_buff = clCreateBuffer(OCL->context, CL_MEM_WRITE_ONLY,
+			sizeof(Uint32) * WIDTH * HEIGHT, NULL, &OCL->err);
+	if (!pixels_buff || OCL->err != CL_SUCCES) 
+		ft_err("Failed to allocate device memory", 1);
+
+	// Transfer the input into device memory
+	OCL->err = clEnqueueWriteBuffer(OCL->commands, objects_buff, CL_TRUE, 0,
+			sizeof(t_obj) * (sc->obj_count), sc->objects, 0, NULL, NULL);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to write to source array (obj)", 1);
+	OCL->err = clEnqueueWriteBuffer(OCL->commands, ray_arr_buff, CL_TRUE, 0,
+			sizeof(t_ray) * WIDTH * HEIGHT, RAY_ARR, 0, NULL, NULL);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to write to source array (obj)", 1);
+	
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 0, sizeof(cl_mem), &ray_arr_buff);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments1", 1);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 1, sizeof(cl_mem), &objects_buff);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 2, sizeof(int), &sc->obj_count);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 3, sizeof(cl_mem), &pixels_buff);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
+
+	OCL->global = WIDTH * HEIGHT;
+	OCL->local = 1;
+	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->object_intersect_kernel,
+			       1, NULL, &OCL->global, &OCL->local,
+			       0, NULL, NULL);
+
+
+	clFinish(OCL->commands);
+	// Read back the results from the device to verify the output
+	OCL->err = clEnqueueReadBuffer(OCL->commands, pixels_buff,
+				    CL_TRUE, 0, sizeof(Uint32) * WIDTH * HEIGHT,
+				    sc->sdl->pixel, 0, NULL, NULL);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to read output array", 1);
+
+
 	sdl_draw(sc);
 	
 	while (running)

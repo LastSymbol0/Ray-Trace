@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<scene name="test_sc" width="1750" height="1300" ambient="20" max_reflections="4">
+	<plane>
+		<pos> 0,0,-10 </pos>
+		<rot> 1,1,1 </rot> 
+		<color> 0000aa </color>
+	</plane>
+	<plane>
+		<pos> 0,0,-10 </pos>
+		<rot> 0,0,1 </rot> 
+		<color> ff0a0a </color>
+	</plane>
+	<plane>
+		<pos> 0,35,0 </pos>
+		<rot>0,-10,0 </rot>
+		<color>  ddddd; </color>
+	</plane>
+	<plane>
+		<pos> 0,-35,0 </pos>
+		<rot> 0,10,0 </rot>
+		<color>  aa00ff </color>
+	</plane>
+
+	<sphere>
+		<pos> -30,-30,0 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+	<sphere>
+		<pos> 30,-30,0 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+	<sphere>
+		<pos> -30,30,0 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+	<sphere>
+		<pos> 30,30,0 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+	<sphere>
+		<pos> -30,-30,70 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+	<sphere>
+		<pos> 30,-30,70 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+	<sphere>
+		<pos> -30,30,70 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+	<sphere>
+		<pos> 30,30,70 </pos>
+		<radius> 10</radius>
+		<color> ddddd </color>
+	</sphere>
+
+	<!-- sphere: 0,-20,50; 6; ff0000; -->
+
+	<cylinder>
+		<pos> 0,0,0 </pos>
+		<rot> 0,1,0 </rot>
+		<radius> 6 </radius>
+		<color> 00dd0d </color>
+	</cylinder>
+	<cylinder> -
+		<pos> 0,0,0 </pos>
+		<rot> 0,1,0 </rot>
+		<radius> 6 </radius>
+		<color> 00dd0d </color>
+	</cylinder>
+	<cylinder> 
+		<pos> 0,0,0 </pos>
+		<rot> 0,1,0 </rot>
+		<radius> 6 </radius>
+		<color> 00dd0d </color>
+	</cylinder>
+	<cylinder> -3
+		<pos> ,0,70 </pos>
+		<rot> 0,1,0 </rot>
+		<radius> 6 </radius>
+		<color> 00dd0d </color>
+	</cylinder>
+	<cylinder> 3
+		<pos> ,0,70 </pos>
+		<rot> 0,1,0 </rot>
+		<radius> 6 </radius>
+		<color> 00dd0d </color>
+	</cylinder>
+
+	<cone> 
+		<pos> -65,0,70 </pos>
+		<rot> 0,1,0 </rot>
+		<radius> 1 </radius>
+		<color> fddddd </color>
+	</cone>
+	<cone>
+		<pos> 65,0,70 </pos>
+		<rot> 0,1,0 </rot>
+		<radius> 1 </radius>
+		<color> fddddd </color>
+	</cone>
+
+	<cam>
+		<pos> 0,0,150 </pos>
+		<rot> 0,0,-1 </rot>
+	</cam>
+</scene>

@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<scene name="somefuckingnicescenename" width="250" height="140" ambient="20" max_reflections="4">
+<scene name="somefuckingnicescenename" width="750" height="540" ambient="20" max_reflections="4">
 
 	<cam>
 		<pos> 0,0,45</pos>
 		<rot> 0,0,-1</rot>
 	</cam>
+
+	<sphere>
+		<pos> 0,0,0</pos>
+		<radius> 15 </radius>
+		<color> 00dfaf </color>
+	</sphere>
+
 
 	<sphere>
 		<pos> 45,-30,5</pos>

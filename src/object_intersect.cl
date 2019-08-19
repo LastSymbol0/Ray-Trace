@@ -60,6 +60,12 @@ float				sphere_intersect(const t_ray ray, const t_obj sph);
 float				cylinder_intersect(const t_ray ray, const t_obj cylinder);
 float				cone_intersect(const t_ray ray, const t_obj cone);
 float				plane_intersect(const t_ray ray, const t_obj plane);
+float				object_intersect(const t_ray ray, const t_obj object);
+int					objects_intersect(const t_ray ray, global t_obj *objects, const int obj_count);
+int					get_color(t_obj obj);
+
+
+
 
 
 
@@ -226,18 +232,60 @@ float				plane_intersect(const t_ray ray, const t_obj plane)
 	return (dist);
 }
 
+int		get_color(t_obj obj)
+{
+	int	color;
 
-__kernel void	object_intersect(const t_ray ray, __global t_obj *objects)
+	color = 0;
+	color += obj.color.blue;
+	color += obj.color.green * 255;
+	color += obj.color.red  * 255  * 255;
+	return (color);
+}
+
+float				object_intersect(const t_ray ray, const t_obj object)
+{
+	if (object.type == SPHERE)
+		return(sphere_intersect(ray, object));
+	else if (object.type == CYLINDER)
+		return(cylinder_intersect(ray, object));
+	else if (object.type == CONE)
+		return(cone_intersect(ray, object));
+	else if (object.type == PLANE)
+		return(plane_intersect(ray, object));
+	
+}
+
+int					objects_intersect(const t_ray ray, __global t_obj *objects, const int obj_count)
+{
+	int	i;
+	int	i_obj;
+	float	t;
+	float	tmp;
+
+	i = -1;
+	i_obj = -1;
+	t = 2147483647;
+	while (++i < obj_count)
+	{
+		if ((tmp = object_intersect(ray, objects[i])) > 0 && tmp < t)
+		{
+			t = tmp;
+			i_obj = i;
+		}
+	}
+	if (i_obj == -1)
+		return (0);
+	return (get_color(objects[i_obj]));
+}
+
+__kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, const int obj_count, __global unsigned int *pixels)
 {
 	int		i;
 
 	i = get_global_id(0);
-	if (objects[i].type == SPHERE)
-		objects[i].t = sphere_intersect(ray, objects[i]);
-	else if (objects[i].type == CYLINDER)
-		objects[i].t = cylinder_intersect(ray, objects[i]);
-	else if (objects[i].type == CONE)
-		objects[i].t = cone_intersect(ray, objects[i]);
-	else if (objects[i].type == PLANE)
-		objects[i].t = plane_intersect(ray, objects[i]);
+	pixels[i] = objects_intersect(ray_arr[i], objects, obj_count);
+	pixels[0] = ray_arr[1].orig.x * 2;
+	pixels[1] = ray_arr[1].orig.y * 2;
+	pixels[2] = ray_arr[1].orig.z * 2;
 }
