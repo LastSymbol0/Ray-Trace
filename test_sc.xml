@@ -127,10 +127,13 @@
 		<color> fddddd </color>
 		<difuse>70</difuse>
 	</cone>
+<<<<<<< HEAD
 	<!-- <cam>
 		<pos> 0,0,100 </pos>
 		<rot> -1,0,-1 </rot>
 	</cam> -->
+=======
+>>>>>>> 6b81a7962715fa6e4ce0b06b2390e849db503d27
 	<cam>
 		<pos> 0,0,150 </pos>
 		<rot> 0,0,-1 </rot>

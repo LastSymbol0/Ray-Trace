@@ -31,7 +31,11 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 			else if (ft_strequ((char *)child->name, "color"))
 				sc->objects[i].color = parse_color((char *)xmlNodeGetContent(child));
 			else if (ft_strequ((char *)child->name, "difuse"))
+<<<<<<< HEAD
 				sc->objects[i].difuse = LOWER_THEN_1(ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
+=======
+				sc->objects[i].difuse = ft_atoi((char *)xmlNodeGetContent(child)) / 100.;
+>>>>>>> 6b81a7962715fa6e4ce0b06b2390e849db503d27
 			else
 				ft_err(ft_strjoin("Undefined object argument: ", (char *)child->name), 1);
 		}
