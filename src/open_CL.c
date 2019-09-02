@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   open_CL.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aillia <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/15 16:50:57 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/15 16:50:58 by aillia           ###   ########.fr       */
+/*   Updated: 2019/08/28 16:03:11 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void	set_ray_arr_ocl(t_scene *sc)
 		ft_err("Failed to set kernel arguments", 1);
 
 	OCL->global = HEIGHT * WIDTH;
-	OCL->local = 1;
+	OCL->local = 2;
 
 	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->ray_arr_kernel,
 			       1, NULL, &OCL->global, &OCL->local,

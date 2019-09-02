@@ -65,8 +65,8 @@ __kernel void	set_ray_arr(const int height, const int width, const t_vec cam_pos
 
 	i = get_global_id(0);
 	fov = M_PI_2_F;
-	x1 = (2 * ((i % height) + 0.5) / (float)width - 1) * tan(fov / 2) * (float)width / (float)height;
-	y1 = -(2 * ((i / height) + 0.5) / (float)height - 1) * tan(fov / 2);
+	x1 = (2 * ((i % width) + 0.5) / (float)width - 1) * tan(fov / 2) * (float)width / (float)height;
+	y1 = -(2 * ((i / width) + 0.5) / (float)height - 1) * tan(fov / 2);
 	results[i].dir = v_norm(v_add(v_new(x1, y1, 0), cam_rot));
 	results[i].orig = cam_pos;
 }

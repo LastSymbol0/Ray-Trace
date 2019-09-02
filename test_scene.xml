@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<scene name="somefuckingnicescenename" width="750" height="540" ambient="20" max_reflections="4">
+<scene name="somefuckingnicescenename" width="750" height="540" ambient="0" max_reflections="4">
 
 	<cam>
 		<pos> 0,0,45</pos>
@@ -35,7 +35,7 @@
 
 	<light>
 		<pos> 2,2,2</pos>
-		<intensity> 50 </intensity>
+		<intensity> 20 </intensity>
 		<color> ffffff </color>		
 	</light>
 

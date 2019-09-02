@@ -6,7 +6,7 @@
 /*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/13 19:58:36 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/13 19:59:06 by vsusol           ###   ########.fr       */
+/*   Updated: 2019/08/29 18:41:38 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ t_color	parse_color(char *s)
 
 	color = abs(ft_atoi_base(s, 16));
 	color_tmp = color;
-	res.blue = (color_tmp << 24) >> 24;
+	res.blue = equalizer((color_tmp << 24) >> 24, 1, 255);
 	color_tmp = color;
-	res.green = (color_tmp << 16) >> 24;
+	res.green = equalizer((color_tmp << 16) >> 24, 1, 255);
 	color_tmp = color;
-	res.red = (color_tmp << 8) >> 24;
+	res.red = equalizer((color_tmp << 8) >> 24, 1, 255);
 	return (res);
 }
 
