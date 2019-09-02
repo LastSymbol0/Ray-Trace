@@ -6,7 +6,7 @@
 /*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/11 17:28:37 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/13 20:12:56 by vsusol           ###   ########.fr       */
+/*   Updated: 2019/08/29 16:15:29 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,61 +108,107 @@ int		get_color(t_obj *obj)
 
 void	ray_trace(t_scene *sc)
 {
-	int running;
-	cl_mem	objects_buff;
-	cl_mem	ray_arr_buff;
-	cl_mem	pixels_buff;
 
+	clock_t end, start;
+	int running;
+	// cl_mem	objects_buff;
+	// cl_mem	ray_arr_buff;
+	// cl_mem	pixels_buff;
+	cl_mem	cl_mem_buf[5];
+
+start = clock();
 	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "ray_cast");
 	running = 1;
 
 
-	objects_buff = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY,
+	OBJECTS_BUFF = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY,
 			sizeof(t_obj) * (sc->obj_count), NULL, &OCL->err);
-	if (!objects_buff || OCL->err != CL_SUCCES) 
-		ft_err("Failed to allocate device memory", 1);
-	ray_arr_buff = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY,
+	if (!OBJECTS_BUFF || OCL->err != CL_SUCCES) 
+		ft_err("Failed to allocate device memory1", 1);
+	RAY_ARR_BUFF = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY,
 			sizeof(t_ray) * WIDTH * HEIGHT, NULL, &OCL->err);
-	if (!ray_arr_buff || OCL->err != CL_SUCCES) 
-		ft_err("Failed to allocate device memory", 1);
-	pixels_buff = clCreateBuffer(OCL->context, CL_MEM_WRITE_ONLY,
+	if (!RAY_ARR_BUFF || OCL->err != CL_SUCCES) 
+		ft_err("Failed to allocate device memory2", 1);
+	PIXELS_BUFF = clCreateBuffer(OCL->context, CL_MEM_WRITE_ONLY,
 			sizeof(Uint32) * WIDTH * HEIGHT, NULL, &OCL->err);
-	if (!pixels_buff || OCL->err != CL_SUCCES) 
-		ft_err("Failed to allocate device memory", 1);
-
+	if (!PIXELS_BUFF || OCL->err != CL_SUCCES) 
+		ft_err("Failed to allocate device memory3", 1);
+	if (sc->light_count == 0)
+	{
+		ft_err("add light", 1);
+	}
+	LIGHT_BUFF = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY, sizeof(t_light) * sc->light_count, NULL, &OCL->err);
+	if (!LIGHT_BUFF || OCL->err != CL_SUCCES) 
+	{
+		printf("%d\n", OCL->err);
+		ft_err("Failed to allocate device memory4", 1);
+	}
+	// AMBIENT_BUFF = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY, sizeof(float), NULL, &OCL->err);
+	// if (!LIGHT_BUFF || OCL->err != CL_SUCCES) 
+	// {
+	// 	printf("%d\n", OCL->err);
+	// 	ft_err("Failed to allocate device memory4", 1);
+	// }
+		
+	printf("%lu\n", sizeof(t_light));
 	// Transfer the input into device memory
-	OCL->err = clEnqueueWriteBuffer(OCL->commands, objects_buff, CL_TRUE, 0,
+	OCL->err = clEnqueueWriteBuffer(OCL->commands, OBJECTS_BUFF, CL_TRUE, 0,
 			sizeof(t_obj) * (sc->obj_count), sc->objects, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array (obj)", 1);
-	OCL->err = clEnqueueWriteBuffer(OCL->commands, ray_arr_buff, CL_TRUE, 0,
+	OCL->err = clEnqueueWriteBuffer(OCL->commands, RAY_ARR_BUFF, CL_TRUE, 0,
 			sizeof(t_ray) * WIDTH * HEIGHT, RAY_ARR, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array (obj)", 1);
+	OCL->err = clEnqueueWriteBuffer(OCL->commands, LIGHT_BUFF, CL_TRUE, 0,
+			sizeof(t_light) * sc->light_count, sc->lights, 0, NULL, NULL);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to write to source array (obj)", 1);
+
+	// OCL->err = clEnqueueWriteBuffer(OCL->commands, AMBIENT_BUFF, CL_TRUE, 0,
+	// 		sizeof(float), &sc->ambient, 0, NULL, NULL);
+	// if (OCL->err != CL_SUCCESS)
+	// 	ft_err("Failed to write to source array (obj)", 1);
 	
-	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 0, sizeof(cl_mem), &ray_arr_buff);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 0, sizeof(cl_mem), &RAY_ARR_BUFF);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments1", 1);
-	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 1, sizeof(cl_mem), &objects_buff);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 1, sizeof(cl_mem), &OBJECTS_BUFF);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments2", 1);
-	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 2, sizeof(int), &sc->obj_count);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 3, sizeof(int), &sc->obj_count);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments2", 1);
-	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 3, sizeof(cl_mem), &pixels_buff);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 4, sizeof(cl_mem), &PIXELS_BUFF);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments2", 1);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 2, sizeof(cl_mem), &LIGHT_BUFF);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 5, sizeof(int), &sc->light_count);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
+	OCL->err  = clSetKernelArg(OCL->object_intersect_kernel, 6, sizeof(float), &sc->ambient);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
+	
+	
 
 	OCL->global = WIDTH * HEIGHT;
+	// OCL->global = 1;
 	OCL->local = 1;
 	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->object_intersect_kernel,
 			       1, NULL, &OCL->global, &OCL->local,
 			       0, NULL, NULL);
 
+	OCL->err = clFinish(OCL->commands);
 
-	clFinish(OCL->commands);
+	end = clock();
+printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
+	if (OCL->err != CL_SUCCES)
+		ft_err("fuck\n", 1);
 	// Read back the results from the device to verify the output
-	OCL->err = clEnqueueReadBuffer(OCL->commands, pixels_buff,
+	OCL->err = clEnqueueReadBuffer(OCL->commands, PIXELS_BUFF,
 				    CL_TRUE, 0, sizeof(Uint32) * WIDTH * HEIGHT,
 				    sc->sdl->pixel, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
@@ -188,6 +234,9 @@ int		main(int ac, char **av)
 {
 	t_scene *sc;
 	clock_t end, start;
+	t_ray *buf;
+	int i = 0;
+	int j = 0;
 
 	if (ac == 2)
 	{
@@ -198,17 +247,44 @@ int		main(int ac, char **av)
 
 
 	start = clock();
-		set_ray_arr_ocl(sc);
-	end = clock();
-	printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
-
-	start = clock();
 		set_ray_arr(sc);
 	end = clock();
 	printf("CPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
+	buf = (t_ray*)ft_memalloc(sizeof(t_ray) * WIDTH * HEIGHT);
+	while (i < WIDTH * HEIGHT)
+	{
+		buf[i] = RAY_ARR[i];
+		i++;
+	}
+	start = clock();
+		set_ray_arr_ocl(sc);
+	end = clock();
+	printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
+	i = 0;
+	while (i < WIDTH * HEIGHT)
+	{
+		if (buf[i].dir.x == RAY_ARR[i].dir.x && buf[i].dir.y == RAY_ARR[i].dir.y && buf[i].dir.z == RAY_ARR[i].dir.z)
+		{
+			j++;
+			// printf("| %f %f %f / %f %f %f |", buf[i].dir.x, buf[i].dir.y, buf[i].dir.z, RAY_ARR[i].dir.x, RAY_ARR[i].dir.y, RAY_ARR[i].dir.z );
+		}
+		// else
+		// {
+		// 	printf("| %f %f %f \\ %f %f %f |", buf[i].dir.x, buf[i].dir.y, buf[i].dir.z, RAY_ARR[i].dir.x, RAY_ARR[i].dir.y, RAY_ARR[i].dir.z);
+		// }
+		// if (i % HEIGHT == 0)
+		// {
+		// 	printf("\n");
+		// }
 
-
+		i++;
+	}
+	printf("\n");
+	printf("%d true of %d\n", j, i);
+	start = clock();
 	ray_trace(sc);
+	end = clock();
+	printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
 	}
 	else
 		write(1, "1 argument plz\n", 15);

@@ -6,7 +6,7 @@
 /*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/11 15:11:50 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/13 20:05:52 by vsusol           ###   ########.fr       */
+/*   Updated: 2019/08/31 15:35:49 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,11 @@
 # define RAY_ARR sc->ray_arr
 # define OCL sc->ocl
 # define CL_SUCCES 0
+# define OBJECTS_BUFF cl_mem_buf[0]
+# define RAY_ARR_BUFF cl_mem_buf[1]
+# define PIXELS_BUFF cl_mem_buf[2]
+# define LIGHT_BUFF cl_mem_buf[3]
+# define AMBIENT_BUFF cl_mem_buf[4]
 
 # define MAX_OBJ_COUNT 50
 
@@ -76,6 +81,7 @@ typedef struct	s_obj
 	int			radius;
 	t_color		color;
 	int			type;
+	float		difuse;
 
 	float		t;
 }				t_obj;
@@ -143,6 +149,8 @@ t_OpenCL	*init_ocl(void);
 void		set_ray_arr_ocl(t_scene *sc);
 void		ray_arr_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);
 void		object_intersect_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);
+float		fequalizer(float value, float min, float max);
+int			equalizer(int value, int min, int max);
 
 
 

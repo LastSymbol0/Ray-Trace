@@ -6,7 +6,7 @@
 /*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/13 19:55:38 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/13 20:05:41 by vsusol           ###   ########.fr       */
+/*   Updated: 2019/08/31 16:15:09 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 				sc->objects[i].radius = ft_atoi((char *)xmlNodeGetContent(child));
 			else if (ft_strequ((char *)child->name, "color"))
 				sc->objects[i].color = parse_color((char *)xmlNodeGetContent(child));
+			else if (ft_strequ((char *)child->name, "difuse"))
+				sc->objects[i].difuse = ft_atoi((char *)xmlNodeGetContent(child)) / 100.;
 			else
 				ft_err(ft_strjoin("Undefined object argument: ", (char *)child->name), 1);
 		}

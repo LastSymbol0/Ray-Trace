@@ -3,14 +3,32 @@
 /*                                                        :::      ::::::::   */
 /*   atoi_base.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aillia <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 17:40:41 by aillia            #+#    #+#             */
-/*   Updated: 2019/07/05 17:40:45 by aillia           ###   ########.fr       */
+/*   Updated: 2019/08/29 18:39:48 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RT.h"
+
+float	fequalizer(float value, float min, float max)
+{
+	if (value < min)
+		value = min;
+	if (value > max)
+		value = max;
+	return (value);
+}
+
+int		equalizer(int value, int min, int max)
+{
+	if (value < min)
+		value = min;
+	if (value > max)
+		value = max;
+	return (value);
+}
 
 int			ft_atoi_base(char *str, int base)
 {
