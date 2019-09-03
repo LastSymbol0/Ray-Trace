@@ -133,16 +133,17 @@
 	</cam> -->
 	<cam>
 		<pos> 0,0,150 </pos>
-		<rot> 0,0,-1 </rot>
+		<rot> 0,0,0 </rot>
 	</cam>
 	<light>
 		<pos> 80,0,100 </pos>
 		<intensity> 100 </intensity>
 		<color> ffffff </color>
 	</light>
-	<light>
+	<!-- <light>
 		<pos> -60,0,100 </pos>
 		<intensity> 100 </intensity>
 		<color> ffffff </color>
-	</light>
+	</light> -->
 </scene>
+  

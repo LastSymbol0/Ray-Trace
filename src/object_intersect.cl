@@ -422,7 +422,7 @@ int				shadows(__global t_obj *obj, const int obj_count, __global t_light *light
 			// difuse coef
 			sum[3] += (light[i].intensity / 100) * hit.obj.difuse * pown(v_dot(rev_light_dir, hit.norm) / (v_magn(rev_light_dir) * v_magn(hit.norm)), 1);
 			// specularity coef
-			sum[3] += spec(hit, light_ray, ray_arr);
+			// sum[3] += spec(hit, light_ray, ray_arr);
 			// distanse coef
 			sum[3] = equalizer(sum[3] * PLUS_INTENSE_LIGHT * equalizer(1.0 / sqrt(t), 0.0, 1.0), 0.0, 1.0);
 

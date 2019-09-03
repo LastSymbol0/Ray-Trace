@@ -36,7 +36,7 @@
 	<light>
 		<pos> 2,2,2</pos>
 		<intensity> 20 </intensity>
-		<color> ffffff </color>		
+		<color> ffffff </color>
 	</light>
 
 </scene>

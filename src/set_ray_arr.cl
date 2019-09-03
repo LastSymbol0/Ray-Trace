@@ -56,7 +56,43 @@ t_vec	v_add(t_vec v1, t_vec v2)
 	return (v);
 }
 
-__kernel void	set_ray_arr(const int height, const int width, const t_vec cam_pos, const t_vec cam_rot, __global t_ray *results)
+t_vec	v_matrix(t_vec	ray, t_vec rot)
+{
+	t_vec	fin;
+	t_vec	buf;
+
+	rot.x = rot.x * M_PI / 180.;
+	rot.y = rot.y * M_PI / 180.;
+	rot.z = rot.z * M_PI / 180.;
+	
+	fin.x = ray.x;
+	fin.y = ray.y;
+	fin.z = ray.z;
+	// printf("%f %f\n",sqrt(1 - pow(rot.y, 2)), rot.z);
+	if (rot.y > 0.00001)
+	{
+		fin.y = ray.y * cos(rot.y) - ray.z * sin(rot.y);
+		fin.z = ray.y * sin(rot.y) + ray.z * cos(rot.y);
+	}
+	// printf("%f %f %f\n", fin.x, fin.y, fin.z);
+	buf.x = fin.x;
+	buf.z = fin.z;
+	if (rot.x > 0.00001)
+	{
+		fin.x = buf.x * cos(rot.x) + buf.z * sin(rot.x);
+		fin.z = -buf.x * sin(rot.x) + buf.z * cos(rot.x);
+	}
+	buf.x = fin.x;
+	buf.y = fin.y;
+	if (rot.z > 0.00001)
+	{
+		fin.x = buf.x * cos(rot.z) - buf.y * sin(rot.z);
+		fin.y = buf.x * sin(rot.z) + buf.y * cos(rot.z);
+	}
+	return (fin);
+}
+
+__kernel void	set_ray_arr(const int height, const int width, __global t_vec *cam_pos, const t_vec cam_rot, __global t_ray *results)
 {
 	float	fov;
 	float	x1;
@@ -64,10 +100,10 @@ __kernel void	set_ray_arr(const int height, const int width, const t_vec cam_pos
 	int		i;
 
 	i = get_global_id(0);
-	fov = M_PI_2_F;
+	fov = M_PI / 3.;
 	x1 = (2 * ((i % width) + 0.5) / (float)width - 1) * tan(fov / 2) * (float)width / (float)height;
 	y1 = -(2 * ((i / width) + 0.5) / (float)height - 1) * tan(fov / 2);
-	results[i].dir = v_norm(v_add(v_new(x1, y1, 0), cam_rot));
-	results[i].orig = cam_pos;
+	results[i].dir = v_norm(v_matrix(v_norm(v_new(x1, y1, -1)),cam_rot));
+	results[i].orig = *cam_pos;
 }
 

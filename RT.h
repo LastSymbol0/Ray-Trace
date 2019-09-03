@@ -6,7 +6,7 @@
 /*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/11 15:11:50 by aillia            #+#    #+#             */
-/*   Updated: 2019/08/31 15:35:49 by vsusol           ###   ########.fr       */
+/*   Updated: 2019/09/03 15:13:53 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <fcntl.h>
 # include <math.h>
 # include <time.h>
+# include <pthread.h>
 
 
 # define WIDTH sc->width
@@ -30,11 +31,11 @@
 # define RAY_ARR sc->ray_arr
 # define OCL sc->ocl
 # define CL_SUCCES 0
-# define OBJECTS_BUFF cl_mem_buf[0]
-# define RAY_ARR_BUFF cl_mem_buf[1]
-# define PIXELS_BUFF cl_mem_buf[2]
-# define LIGHT_BUFF cl_mem_buf[3]
-# define AMBIENT_BUFF cl_mem_buf[4]
+# define OBJECTS_BUFF OCL[1].output[0]
+# define RAY_ARR_BUFF OCL[1].output[1]
+# define PIXELS_BUFF OCL[1].output[2]
+# define LIGHT_BUFF OCL[1].output[3]
+# define AMBIENT_BUFF OCL[1].output[4]
 
 # define MAX_OBJ_COUNT 50
 
@@ -68,6 +69,8 @@ typedef struct	s_ray
 {
 	t_vec		orig;
 	t_vec		dir;
+	cl_float3	orig_new;
+	cl_float3	dir_new;
 }				t_ray;
 
 typedef struct	s_light
@@ -118,6 +121,13 @@ typedef struct			s_OpenCL
 	cl_mem				*output;
 }						t_OpenCL;
 
+typedef struct s_mythread
+{
+	pthread_t	tid[1];
+	clock_t end;
+	clock_t start;
+	int		die;
+}				t_mythread;
 
 typedef struct	s_scene
 {
@@ -138,6 +148,7 @@ typedef struct	s_scene
 	char		*name;
 	int			width;
 	int			height;
+	t_mythread	thread;
 }				t_scene;
 
 int			ft_atoi_base(char *str, int base);
