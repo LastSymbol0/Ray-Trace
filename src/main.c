@@ -38,10 +38,10 @@ void	set_ray_arr(t_scene *sc)
 	}	
 }
 
-void	ray_trace(t_scene *sc)
+void	ray_trace_ocl(t_scene *sc)
 {
 
-	// object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "ray_cast");
+	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "ray_cast");
 	OCL[1].output = (cl_mem*)malloc(sizeof(cl_mem) * 5);
 	OBJECTS_BUFF = clCreateBuffer(OCL[1].context, CL_MEM_READ_ONLY,
 			sizeof(t_obj) * (sc->obj_count), NULL, &OCL[1].err);
@@ -97,7 +97,6 @@ void	ray_trace(t_scene *sc)
 	
 	
 	OCL[1].global = WIDTH * HEIGHT;
-	// OCL->global = 1;
 	OCL[1].local = 1;
 	OCL[1].err = clEnqueueNDRangeKernel(OCL[1].commands, OCL[1].object_intersect_kernel,
 			       1, NULL, &OCL[1].global, &OCL[1].local,
@@ -123,8 +122,8 @@ void	ray_trace_2(t_scene *sc)
 	if (OCL[1].err != CL_SUCCESS)
 		ft_err("Failed to write to source array (ray_arr)", 1);
 	
-	OCL[1].global = WIDTH * HEIGHT;
-	OCL[1].local = 1;
+	// OCL[1].global = WIDTH * HEIGHT;
+	// OCL[1].local = 1;
 	OCL[1].err = clEnqueueNDRangeKernel(OCL[1].commands, OCL[1].object_intersect_kernel,
 			       1, NULL, &OCL[1].global, &OCL[1].local,
 			       0, NULL, NULL);
@@ -184,36 +183,24 @@ void	*mytime(void *thread)
 int		main(int ac, char **av)
 {
 	t_scene *sc;
-	// clock_t end, start;
 	int running = 1;
-	char *KernelSource;
 
 	if (ac == 2)
 	{
 		sc = parser(av[1]);
-		printf("cam rot %f %f %f", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
 		sc->sdl = sdl_init(sc);
 		// test_sdl(sc);
 		OCL = init_ocl();
 
 		pthread_create(sc->thread.tid, NULL, mytime, &sc->thread);
-		sc->thread.start = clock();
-			set_ray_arr(sc);
-		sc->thread.end = clock();
-		// printf("CPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
 
-		KernelSource = read_file("src/set_ray_arr.cl", 5508);
-		ray_arr_build_ocl_source(sc, KernelSource, "set_ray_arr");
 		sc->thread.start = clock();
 			set_ray_arr_ocl(sc);
 		sc->thread.end = clock();
-		// printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
-		object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "ray_cast");
 
 		sc->thread.start = clock();
-			ray_trace(sc);
+			ray_trace_ocl(sc);
 		sc->thread.end = clock();
-		//printf("GPU: The above code block was executed in %.4f second(s)\n", ((double) end - start) / ((double) CLOCKS_PER_SEC));
 
 		sdl_draw(sc);
 		while (running)
@@ -223,7 +210,8 @@ int		main(int ac, char **av)
 				else if (SDL_SCANCODE_SPACE == sc->sdl->event.key.keysym.scancode)
 				{
 					sc->thread.start = clock();
-					printf("%f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z );
+					printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
+					printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z );
 					sc->cam.pos.z += -1;
 
 					set_ray_arr_ocl_2(sc);

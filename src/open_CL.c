@@ -113,12 +113,12 @@ void	ray_arr_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName)
 
 void	set_ray_arr_ocl(t_scene *sc)
 {
-	// char	*KernelSource;
+	char	*KernelSource;
 	
 	OCL->output = (cl_mem*)malloc(sizeof(cl_mem) * 2);
-	// KernelSource = read_file("src/set_ray_arr.cl", 5508);
+	KernelSource = read_file("src/set_ray_arr.cl", 5508);
 	// printf("\nKernelSource:\n%s\n", KernelSource);
-	// ray_arr_build_ocl_source(sc, KernelSource, "set_ray_arr");
+	ray_arr_build_ocl_source(sc, KernelSource, "set_ray_arr");
 	*OCL->output = clCreateBuffer(OCL->context, CL_MEM_WRITE_ONLY,
 			sizeof(t_ray) * WIDTH * HEIGHT, NULL, &OCL->err);
 	if (!OCL->output || OCL->err != CL_SUCCES) 

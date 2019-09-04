@@ -140,10 +140,10 @@
 		<intensity> 100 </intensity>
 		<color> ffffff </color>
 	</light>
-	<!-- <light>
+	<light>
 		<pos> -60,0,100 </pos>
 		<intensity> 100 </intensity>
 		<color> ffffff </color>
-	</light> -->
+	</light>
 </scene>
   
