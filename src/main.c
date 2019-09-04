@@ -41,7 +41,7 @@ void	set_ray_arr(t_scene *sc)
 void	ray_trace_ocl(t_scene *sc)
 {
 
-	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "ray_cast");
+	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "main_f");
 	OCL[1].output = (cl_mem*)malloc(sizeof(cl_mem) * 5);
 	OBJECTS_BUFF = clCreateBuffer(OCL[1].context, CL_MEM_READ_ONLY,
 			sizeof(t_obj) * (sc->obj_count), NULL, &OCL[1].err);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<scene name="test_sc" width="1000" height="500" ambient="1" max_reflections="4">
+<scene name="test_sc" width="2000" height="800" ambient="1" max_reflections="4">
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 1,1,1 </rot> 

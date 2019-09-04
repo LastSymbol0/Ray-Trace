@@ -88,6 +88,8 @@ typedef struct	s_obj
 	t_fcolor	fcolor;
 	int			type;
 	float		difuse;
+	float		reflection_coef;
+	short		reflection_count;
 
 	float		t;
 }				t_obj;
