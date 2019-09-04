@@ -124,12 +124,12 @@ void	set_ray_arr_ocl(t_scene *sc)
 	if (!OCL->output || OCL->err != CL_SUCCES) 
 		ft_err("Failed to allocate device memory", 1);
 	OCL->output[1] = clCreateBuffer(OCL->context, CL_MEM_READ_ONLY,
-			sizeof(t_vec), NULL, &OCL->err);
+			sizeof(cl_float3), NULL, &OCL->err);
 	if (!OCL->output || OCL->err != CL_SUCCES) 
 		ft_err("Failed to allocate device memory", 1);
 	
 	OCL->err = clEnqueueWriteBuffer(OCL->commands, OCL->output[1], CL_TRUE, 0,
-							sizeof(t_vec), &sc->cam.pos, 0, NULL, NULL);
+							sizeof(cl_float3), &sc->cam.pos, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array (ray_arr)", 1);
 
@@ -142,7 +142,7 @@ void	set_ray_arr_ocl(t_scene *sc)
 	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 2, sizeof(cl_mem), &OCL->output[1]);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
-	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 3, sizeof(t_vec), &sc->cam.rot);
+	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 3, sizeof(cl_float3), &sc->cam.rot);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
 	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 4, sizeof(cl_mem), OCL->output);

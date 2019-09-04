@@ -145,7 +145,7 @@ void	set_ray_arr_ocl_2(t_scene *sc)
 {
 	
 	OCL->err = clEnqueueWriteBuffer(OCL->commands, OCL->output[1], CL_TRUE, 0,
-							sizeof(t_vec), &sc->cam.pos, 0, NULL, NULL);
+							sizeof(cl_float3), &sc->cam.pos, 0, NULL, NULL);
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array (ray_arr)", 1);
 

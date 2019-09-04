@@ -12,17 +12,17 @@
 
 #include "RT.h"
 
-t_vec	v_norm(t_vec v)
+cl_float3	v_norm(cl_float3 v)
 {
 	return (v_scale(v, 1.0 / v_magn(v)));
 }
 
-float	v_magn(t_vec v)
+float	v_magn(cl_float3 v)
 {
 	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
 }
 
-t_vec	v_scale(t_vec v, float n)
+cl_float3	v_scale(cl_float3 v, float n)
 {
 	v.x *= n;
 	v.y *= n;
@@ -30,9 +30,9 @@ t_vec	v_scale(t_vec v, float n)
 	return (v);
 }
 
-t_vec	v_add(t_vec v1, t_vec v2)
+cl_float3	v_add(cl_float3 v1, cl_float3 v2)
 {
-	t_vec v;
+	cl_float3 v;
 
 	v.x = v1.x + v2.x;
 	v.y = v1.y + v2.y;

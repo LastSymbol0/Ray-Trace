@@ -1,4 +1,5 @@
 #define PLUS_INTENSE_LIGHT 4.0
+#define cl_float3 __float3
 
 enum				e_typeobject
 {
@@ -25,23 +26,23 @@ typedef struct		s_color
 	short			blue;
 }					t_color;
 
-typedef struct		s_vec
-{
-	float			x;
-	float			y;
-	float			z;
-}					t_vec;
+// typedef struct		s_vec
+// {
+// 	float			x;
+// 	float			y;
+// 	float			z;
+// }					cl_float3;
 
 typedef struct		s_ray
 {
-	t_vec			orig;
-	t_vec			dir;
+	cl_float3		orig;
+	cl_float3		dir;
 }					t_ray;
 
 typedef struct		s_obj
 {
-	t_vec			pos;
-	t_vec			rot;
+	cl_float3		pos;
+	cl_float3		rot;
 	int				radius;
 	t_color			color;
 	int				type;
@@ -52,7 +53,7 @@ typedef struct		s_obj
 
 typedef struct		s_light
 {
-	t_vec			pos;
+	cl_float3		pos;
 	float			intensity;
 	t_color			color;
 }					t_light;
@@ -66,23 +67,23 @@ typedef struct		s_light_arr
 typedef struct		s_hit
 {
 	t_obj			obj;
-	t_vec			pos;
-	t_vec			norm;
+	cl_float3		pos;
+	cl_float3		norm;
 }					t_hit;
 
-t_vec				v_minus(t_vec v1, t_vec v2);
-float				v_dot(t_vec a, t_vec b);
-t_vec				v_add(t_vec v1, t_vec v2);
-t_vec				v_scale(t_vec v, float n);
-t_vec				v_norm(t_vec v);
-float				v_magn(t_vec v);
-t_vec				v_new(float x, float y, float z);
-t_vec				v_cross(t_vec v1, t_vec v2);
-float				v_cos(t_vec v1, t_vec v2);
+// cl_float3			v_minus(cl_float3v1, cl_float3v2);
+// float				dot(cl_float3a, cl_float3b);
+// cl_float3			v_add(cl_float3v1, cl_float3v2);
+// cl_float3			v_scale(cl_float3v, float n);
+// cl_float3			normalize(cl_float3v);
+// float				length(cl_float3v);
+// cl_float3			v_new(float x, float y, float z);
+// cl_float3			cross(cl_float3v1, cl_float3v2);
+float				v_cos(cl_float3 v1, cl_float3 v2);
 
 float				LOWER_AND_NOT_0(float a, float b);
-float3				vectofloat(t_vec vec);
-t_vec				floattovec(float3 f3);
+float3				vectofloat(cl_float3 vec);
+cl_float3			floattovec(float3 f3);
 float				equalizer(float value, float min, float max);
 
 float				sphere_intersect(const t_ray ray, const t_obj sph);
@@ -102,78 +103,78 @@ float				spec(t_hit hit, t_ray light_ray, t_ray ray_arr);
 /*********************************************************************************/
 /* Vec */
 
-float	v_dot(t_vec a, t_vec b)
+// float	dot(cl_float3a, cl_float3b)
+// {
+// 	return (a.x * b.x + a.y * b.y + a.z * b.z);
+// }
+
+// cl_float3 v_minus(cl_float3v1, cl_float3v2)
+// {
+// 	cl_float3res;
+
+// 	res.x = v1.x - v2.x;
+// 	res.y = v1.y - v2.y;
+// 	res.z = v1.z - v2.z;
+// 	return (res);
+// }
+
+// cl_float3v_new(float x, float y, float z)
+// {
+// 	cl_float3v;
+
+// 	v.x = x;
+// 	v.y = y;
+// 	v.z = z;
+// 	return (v);
+// }
+
+// cl_float3normalize(cl_float3v)
+// {
+// 	return (v_scale(v, 1.0 / length(v)));
+// }
+
+// float	length(cl_float3v)
+// {
+// 	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
+// }
+
+// cl_float3v_scale(cl_float3v, float n)
+// {
+// 	v.x *= n;
+// 	v.y *= n;
+// 	v.z *= n;
+// 	return (v);
+// }
+
+// cl_float3v_add(cl_float3v1, cl_float3v2)
+// {
+// 	cl_float3v;
+
+// 	v.x = v1.x + v2.x;
+// 	v.y = v1.y + v2.y;
+// 	v.z = v1.z + v2.z;
+// 	return (v);
+// }
+
+// cl_float3cross(cl_float3v1, cl_float3v2)
+// {
+// 	cl_float3v;
+
+// 	v.x = v1.y * v2.z - v1.z * v2.y;
+// 	v.y = v1.z * v2.x - v1.x * v2.z;
+// 	v.z = v1.x * v2.y - v1.y * v2.x;
+// 	return (v);
+// }
+
+float	v_cos(cl_float3 v1, cl_float3 v2)
 {
-	return (a.x * b.x + a.y * b.y + a.z * b.z);
-}
-
-t_vec	v_minus(t_vec v1, t_vec v2)
-{
-	t_vec res;
-
-	res.x = v1.x - v2.x;
-	res.y = v1.y - v2.y;
-	res.z = v1.z - v2.z;
-	return (res);
-}
-
-t_vec	v_new(float x, float y, float z)
-{
-	t_vec v;
-
-	v.x = x;
-	v.y = y;
-	v.z = z;
-	return (v);
-}
-
-t_vec	v_norm(t_vec v)
-{
-	return (v_scale(v, 1.0 / v_magn(v)));
-}
-
-float	v_magn(t_vec v)
-{
-	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
-}
-
-t_vec	v_scale(t_vec v, float n)
-{
-	v.x *= n;
-	v.y *= n;
-	v.z *= n;
-	return (v);
-}
-
-t_vec	v_add(t_vec v1, t_vec v2)
-{
-	t_vec v;
-
-	v.x = v1.x + v2.x;
-	v.y = v1.y + v2.y;
-	v.z = v1.z + v2.z;
-	return (v);
-}
-
-t_vec	v_cross(t_vec v1, t_vec v2)
-{
-	t_vec	v;
-
-	v.x = v1.y * v2.z - v1.z * v2.y;
-	v.y = v1.z * v2.x - v1.x * v2.z;
-	v.z = v1.x * v2.y - v1.y * v2.x;
-	return (v);
-}
-
-float	v_cos(t_vec v1, t_vec v2)
-{
-	return(v_dot(v1, v2) / (v_magn(v1) * v_magn(v2)));
+	return(dot(v1, v2) / (length(v1) * length(v2)));
 }
 
 /*********************************************************************************/
 /* Utils */
 
-float3	vectofloat(t_vec vec)
+float3	vectofloat(cl_float3 vec)
 {
 	float3 f3;
 
@@ -182,9 +183,9 @@ float3	vectofloat(t_vec vec)
 	f3.z = vec.z;
 	return(f3);
 }
-t_vec	floattovec(float3 f3)
+cl_float3 floattovec(float3 f3)
 {
-	t_vec	vec;
+	cl_float3 vec;
 
 	vec.x = f3.x;
 	vec.y = f3.y;
@@ -217,38 +218,38 @@ float	LOWER_AND_NOT_0(float a, float b)
 */
 float				sphere_intersect(const t_ray ray, const t_obj sph)
 {
-	t_vec	l;
-	t_vec	pc;
-	// t_vec	hit;
+	cl_float3 l;
+	cl_float3 pc;
+	// cl_float3hit;
 	float	dist;
 	float	di1;
 
-	l = v_minus(sph.pos, ray.orig);
-	if (v_dot(ray.dir, l) < 0)
+	l = sph.pos - ray.orig;
+	if (dot(ray.dir, l) < 0)
 	{
-		if (v_magn(l) > sph.radius)
+		if (length(l) > sph.radius)
 			return (-1);
-		if (v_magn(l) == sph.radius)
-			return(v_magn(l));
+		if (length(l) == sph.radius)
+			return(length(l));
 		else
 		{
-			pc = v_add(ray.orig, (v_scale(ray.dir, v_dot(ray.dir, l))));
-			dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)v_magn(v_minus(pc, sph.pos)), (float)2));
-			di1 = dist - v_magn(v_minus(pc, ray.orig));
+			pc = ray.orig + (ray.dir * dot(ray.dir, l));
+			dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)length(pc - sph.pos), (float)2));
+			di1 = dist - length(pc - ray.orig);
 			// hit = v_add(ray.orig, v_scale(ray.dir, di1));
 			return (di1);
 		}
 	}
 	else
 	{
-		pc = v_add(ray.orig, (v_scale(ray.dir, v_dot(ray.dir, l))));
-		if (v_magn(v_minus(sph.pos, pc)) > sph.radius)
+		pc = ray.orig + (ray.dir * dot(ray.dir, l));
+		if (length(sph.pos - pc) > sph.radius)
 			return (-1);
-		dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)v_magn(v_minus(pc, sph.pos)), (float)2));
-		if (v_magn(l) > sph.radius)
-			di1 = v_magn(v_minus(pc, ray.orig)) - dist;
+		dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)length(pc - sph.pos), (float)2));
+		if (length(l) > sph.radius)
+			di1 = length(pc - ray.orig) - dist;
 		else
-			di1 = v_magn(v_minus(pc, ray.orig)) + dist;
+			di1 = length(pc - ray.orig) + dist;
 			return (di1);
 	}
 }
@@ -258,15 +259,15 @@ float				sphere_intersect(const t_ray ray, const t_obj sph)
 */
 float				cylinder_intersect(const t_ray ray, const t_obj cylinder)
 {
-	t_vec	l;
+	cl_float3 l;
 	t_eq	eq;
 	float	t1;
 	float	t2;
 
-	l = v_minus(ray.orig, cylinder.pos);
-	eq.a = v_dot(ray.dir, ray.dir) - pow((float)v_dot(ray.dir, cylinder.rot), (float)2);
-	eq.b = 2 * (v_dot(ray.dir, l) - v_dot(ray.dir, cylinder.rot) * v_dot(l, cylinder.rot));
-	eq.c = v_dot(l, l) - pow((float)v_dot(l, cylinder.rot), (float)2) -	pow((float)cylinder.radius, (float)2);
+	l = ray.orig - cylinder.pos;
+	eq.a = dot(ray.dir, ray.dir) - pow((float)dot(ray.dir, cylinder.rot), (float)2);
+	eq.b = 2 * (dot(ray.dir, l) - dot(ray.dir, cylinder.rot) * dot(l, cylinder.rot));
+	eq.c = dot(l, l) - pow((float)dot(l, cylinder.rot), (float)2) -	pow((float)cylinder.radius, (float)2);
 	eq.d = eq.b * eq.b - 4 * eq.a * eq.c;
 	if (eq.d < 0)
 		return (-1);
@@ -283,15 +284,15 @@ float				cylinder_intersect(const t_ray ray, const t_obj cylinder)
 # define CONE_COEF 0.1
 float				cone_intersect(const t_ray ray, const t_obj cone)
 {
-	t_vec	l;
+	cl_float3 l;
 	t_eq	eq;
 	float	t1;
 	float	t2;
 
-	l = v_minus(ray.orig, cone.pos);
-	eq.a = v_dot(ray.dir, ray.dir) - (CONE_COEF + pow((float)cone.radius, (float)2)) * pow((float)v_dot(ray.dir, cone.rot), (float)2);
-	eq.b = 2 * (v_dot(ray.dir, l) - (CONE_COEF + pow((float)cone.radius, (float)2)) * v_dot(ray.dir, cone.rot) * v_dot(l, cone.rot));
-	eq.c = v_dot(l, l) - (CONE_COEF + pow((float)cone.radius, (float)2)) * pow((float)v_dot(l, cone.rot), (float)     2);
+	l = ray.orig - cone.pos;
+	eq.a = dot(ray.dir, ray.dir) - (CONE_COEF + pow((float)cone.radius, (float)2)) * pow((float)dot(ray.dir, cone.rot), (float)2);
+	eq.b = 2 * (dot(ray.dir, l) - (CONE_COEF + pow((float)cone.radius, (float)2)) * dot(ray.dir, cone.rot) * dot(l, cone.rot));
+	eq.c = dot(l, l) - (CONE_COEF + pow((float)cone.radius, (float)2)) * pow((float)dot(l, cone.rot), (float)     2);
 	eq.d = eq.b * eq.b - 4 * eq.a * eq.c;
 	if (eq.d < 0)
 		return (-1);
@@ -305,11 +306,11 @@ float				cone_intersect(const t_ray ray, const t_obj cone)
 */
 float				plane_intersect(const t_ray ray, const t_obj plane)
 {
-	t_vec	l;
+	cl_float3 l;
 	float	dist;
 
-	l = v_minus(ray.orig, plane.pos);
-	dist = (((v_dot(plane.rot, plane.pos) - v_dot(plane.rot, ray.orig)) / v_dot(ray.dir, plane.rot)));
+	l = ray.orig - plane.pos;
+	dist = (((dot(plane.rot, plane.pos) - dot(plane.rot, ray.orig)) / dot(ray.dir, plane.rot)));
 	return (dist);
 }
 
@@ -331,22 +332,22 @@ float				object_intersect(const t_ray ray, const t_obj object)
 
 void					set_norm(t_hit *hit)
 {
-	t_vec	buf;
+	cl_float3 buf;
 
 	if (hit->obj.type == SPHERE)
-		hit->norm = v_norm(v_minus(hit->pos, hit->obj.pos));
+		hit->norm = normalize(hit->pos - hit->obj.pos);
 	else if (hit->obj.type == PLANE)
 		hit->norm = hit->obj.rot;
 	else if (hit->obj.type == CYLINDER)
-		hit->norm = v_cross(v_cross(hit->obj.rot, v_minus(hit->pos, hit->obj.pos)), hit->obj.rot);
+		hit->norm = cross(cross(hit->obj.rot, hit->pos - hit->obj.pos), hit->obj.rot);
 	else if (hit->obj.type == CONE)
 	{
-		buf = v_minus(hit->pos, hit->obj.pos);
+		buf = hit->pos - hit->obj.pos;
 		if (v_cos(buf, hit->obj.rot) < 0)
-			hit->norm = v_cross(v_cross(v_scale(hit->obj.rot, -1), buf), buf);
+			hit->norm = cross(cross((hit->obj.rot * -1), buf), buf);
 		else
-			hit->norm = v_cross(v_cross(hit->obj.rot, buf), buf);
-	}
+			hit->norm = cross(cross(hit->obj.rot, buf), buf);
+	} 
 }
 
 t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int obj_count)
@@ -365,21 +366,22 @@ t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int 
 		{
 			t = tmp;
 			hit.obj = objects[i];
+			// printf("Хит!");
 		}
 	}
 	if (hit.obj.type == NONE)
 		return (hit);
-	hit.pos = v_add(v_scale(ray.dir, t), ray.orig);
+	hit.pos = (ray.dir * t) + ray.orig;
 	set_norm(&hit);
 	return (hit);
 }
 
 float			spec(t_hit hit, t_ray light_ray, t_ray ray_arr)
 {
-	t_vec	spec_ray;
+	cl_float3	spec_ray;
 
-	spec_ray = v_add(v_minus(v_scale(hit.norm, v_cos(hit.norm, v_scale(light_ray.dir, -1))), v_scale(light_ray.dir, -1)), hit.norm);
-	return(equalizer(pown(v_cos(spec_ray, v_norm(v_minus(ray_arr.orig, hit.pos))), 20), 0., 1.));
+	spec_ray = ((hit.norm * v_cos(hit.norm, light_ray.dir * -1)) - light_ray.dir * -1) + hit.norm;
+	return (equalizer(pown(v_cos(spec_ray, normalize(ray_arr.orig - hit.pos)), 20), 0., 1.));
 }
 
 float				objects_intersect_shadows(const t_ray ray, __global t_obj *objects, const int obj_count, float t)
@@ -401,7 +403,7 @@ int				shadows(__global t_obj *obj, const int obj_count, __global t_light *light
 	float			buf;
 	float			sum[5];
 	t_ray			light_ray;
-	t_vec			rev_light_dir;
+	cl_float3		rev_light_dir;
 
 	sum[0] = 0;
 	sum[1] = 0;
@@ -411,16 +413,16 @@ int				shadows(__global t_obj *obj, const int obj_count, __global t_light *light
 	while (++i < light_count)
 	{
 		light_ray.orig = light[i].pos;
-		light_ray.dir = v_minus(hit.pos, light[i].pos);
-		t = v_magn(light_ray.dir) - 1;
-		light_ray.dir = v_norm(light_ray.dir);
+		light_ray.dir = hit.pos - light[i].pos;
+		t = length(light_ray.dir) - 1;
+		light_ray.dir = normalize(light_ray.dir);
 
 		buf = fabs(t - objects_intersect_shadows(light_ray, obj, obj_count, t));
 		if (buf < 0.000001)
 		{
-			rev_light_dir = v_scale(light_ray.dir, -1);
+			rev_light_dir = light_ray.dir * -1;
 			// difuse coef
-			sum[3] += (light[i].intensity / 100) * hit.obj.difuse * pown(v_dot(rev_light_dir, hit.norm) / (v_magn(rev_light_dir) * v_magn(hit.norm)), 1);
+			sum[3] += (light[i].intensity / 100) * hit.obj.difuse * pown(dot(rev_light_dir, hit.norm) / (length(rev_light_dir) * length(hit.norm)), 1);
 			// specularity coef
 			// sum[3] += spec(hit, light_ray, ray_arr);
 			// distanse coef

@@ -12,10 +12,10 @@
 
 #include "RT.h"
 
-t_vec	parse_vec(char *s)
+cl_float3	parse_vec(char *s)
 {
-	t_vec	v;
-	char	**split;
+	cl_float3	v;
+	char		**split;
 
 	split = ft_strsplit(s, ',');
 	if (arr_len(split) != 3)

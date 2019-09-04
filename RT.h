@@ -58,32 +58,25 @@ typedef struct	s_color
 	short		blue;
 }				t_color;
 
-typedef struct	s_vec
-{
-	float		x;
-	float		y;
-	float		z;
-}				t_vec;
+
 
 typedef struct	s_ray
 {
-	t_vec		orig;
-	t_vec		dir;
-	cl_float3	orig_new;
-	cl_float3	dir_new;
+	cl_float3	orig;
+	cl_float3	dir;
 }				t_ray;
 
 typedef struct	s_light
 {
-	t_vec		pos;
+	cl_float3	pos;
 	float		intensity;
 	t_color		color;
 }				t_light;
 
 typedef struct	s_obj
 {
-	t_vec		pos;
-	t_vec		rot;
+	cl_float3	pos;
+	cl_float3	rot;
 	int			radius;
 	t_color		color;
 	int			type;
@@ -183,7 +176,7 @@ void	scene_memory_alloc(t_scene *sc, xmlNodePtr root);
 /*
 ** p_utils.c
 */
-t_vec	parse_vec(char *s);
+cl_float3	parse_vec(char *s);
 t_color	parse_color(char *s);
 short	get_type(char *s);
 void	recurs(xmlNodePtr node, int n);
@@ -208,13 +201,13 @@ char	*read_file(char *filename, size_t file_size);
 /*
 ** vec.c & vec2.c
 */
-t_vec			v_minus(t_vec v1, t_vec v2);
-float			v_dot(t_vec a, t_vec b);
-t_vec			v_new(float x, float y, float z);
-t_vec			v_norm(t_vec v);
-float			v_magn(t_vec v);
-t_vec			v_scale(t_vec v, float n);
-t_vec			v_add(t_vec v1, t_vec v2);
-float			v_angle(t_vec a, t_vec b);
+cl_float3		v_minus(cl_float3 v1, cl_float3 v2);
+float			v_dot(cl_float3 a, cl_float3 b);
+cl_float3		v_new(float x, float y, float z);
+cl_float3		v_norm(cl_float3 v);
+float			v_magn(cl_float3 v);
+cl_float3		v_scale(cl_float3 v, float n);
+cl_float3		v_add(cl_float3 v1, cl_float3 v2);
+float			v_angle(cl_float3 a, cl_float3 b);
 
 #endif
