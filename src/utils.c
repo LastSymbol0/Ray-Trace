@@ -12,6 +12,15 @@
 
 #include "RT.h"
 
+t_fcolor	get_fcolor(t_color color)
+{
+	t_fcolor	fcolor;
+
+	fcolor.red = color.red / 255.;
+	fcolor.green = color.green / 255.;
+	fcolor.blue = color.blue / 255.;
+	return (fcolor);
+}
 
 void	pixel_put(int color)
 {

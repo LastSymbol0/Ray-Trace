@@ -138,12 +138,12 @@
 	<light>
 		<pos> 80,0,100 </pos>
 		<intensity> 100 </intensity>
-		<color> ffffff </color>
+		<color> ff1f1f </color>
 	</light>
 	<light>
 		<pos> -60,0,100 </pos>
 		<intensity> 100 </intensity>
-		<color> ffffff </color>
+		<color> ffd1e2 </color>
 	</light>
 </scene>
   

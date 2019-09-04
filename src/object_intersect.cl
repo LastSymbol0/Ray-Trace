@@ -26,6 +26,13 @@ typedef struct		s_color
 	short			blue;
 }					t_color;
 
+typedef struct		s_fcolor
+{
+	float			red;
+	float			green;
+	float			blue;
+}					t_fcolor;
+
 // typedef struct		s_vec
 // {
 // 	float			x;
@@ -45,6 +52,7 @@ typedef struct		s_obj
 	cl_float3		rot;
 	int				radius;
 	t_color			color;
+	t_fcolor		fcolor;
 	int				type;
 	float			difuse;
 
@@ -56,6 +64,7 @@ typedef struct		s_light
 	cl_float3		pos;
 	float			intensity;
 	t_color			color;
+	t_fcolor		fcolor;
 }					t_light;
 
 typedef struct		s_light_arr
@@ -75,8 +84,8 @@ typedef struct		s_hit
 // float				dot(cl_float3a, cl_float3b);
 // cl_float3			v_add(cl_float3v1, cl_float3v2);
 // cl_float3			v_scale(cl_float3v, float n);
-// cl_float3			normalize(cl_float3v);
-// float				length(cl_float3v);
+// cl_float3			fast_normalize(cl_float3v);
+// float				fast_length(cl_float3v);
 // cl_float3			v_new(float x, float y, float z);
 // cl_float3			cross(cl_float3v1, cl_float3v2);
 float				v_cos(cl_float3 v1, cl_float3 v2);
@@ -128,12 +137,12 @@ float				spec(t_hit hit, t_ray light_ray, t_ray ray_arr);
 // 	return (v);
 // }
 
-// cl_float3normalize(cl_float3v)
+// cl_float3fast_normalize(cl_float3v)
 // {
-// 	return (v_scale(v, 1.0 / length(v)));
+// 	return (v_scale(v, 1.0 / fast_length(v)));
 // }
 
-// float	length(cl_float3v)
+// float	fast_length(cl_float3v)
 // {
 // 	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
 // }
@@ -168,7 +177,7 @@ float				spec(t_hit hit, t_ray light_ray, t_ray ray_arr);
 
 float	v_cos(cl_float3 v1, cl_float3 v2)
 {
-	return(dot(v1, v2) / (length(v1) * length(v2)));
+	return(dot(v1, v2) / (fast_length(v1) * fast_length(v2)));
 }
 
 /*********************************************************************************/
@@ -227,15 +236,15 @@ float				sphere_intersect(const t_ray ray, const t_obj sph)
 	l = sph.pos - ray.orig;
 	if (dot(ray.dir, l) < 0)
 	{
-		if (length(l) > sph.radius)
+		if (fast_length(l) > sph.radius)
 			return (-1);
-		if (length(l) == sph.radius)
-			return(length(l));
+		if (fast_length(l) == sph.radius)
+			return (fast_length(l));
 		else
 		{
 			pc = ray.orig + (ray.dir * dot(ray.dir, l));
-			dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)length(pc - sph.pos), (float)2));
-			di1 = dist - length(pc - ray.orig);
+			dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)fast_length(pc - sph.pos), (float)2));
+			di1 = dist - fast_length(pc - ray.orig);
 			// hit = v_add(ray.orig, v_scale(ray.dir, di1));
 			return (di1);
 		}
@@ -243,13 +252,13 @@ float				sphere_intersect(const t_ray ray, const t_obj sph)
 	else
 	{
 		pc = ray.orig + (ray.dir * dot(ray.dir, l));
-		if (length(sph.pos - pc) > sph.radius)
+		if (fast_length(sph.pos - pc) > sph.radius)
 			return (-1);
-		dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)length(pc - sph.pos), (float)2));
-		if (length(l) > sph.radius)
-			di1 = length(pc - ray.orig) - dist;
+		dist = sqrt(pow((float)sph.radius, (float)2) - pow((float)fast_length(pc - sph.pos), (float)2));
+		if (fast_length(l) > sph.radius)
+			di1 = fast_length(pc - ray.orig) - dist;
 		else
-			di1 = length(pc - ray.orig) + dist;
+			di1 = fast_length(pc - ray.orig) + dist;
 			return (di1);
 	}
 }
@@ -335,7 +344,7 @@ void					set_norm(t_hit *hit)
 	cl_float3 buf;
 
 	if (hit->obj.type == SPHERE)
-		hit->norm = normalize(hit->pos - hit->obj.pos);
+		hit->norm = fast_normalize(hit->pos - hit->obj.pos);
 	else if (hit->obj.type == PLANE)
 		hit->norm = hit->obj.rot;
 	else if (hit->obj.type == CYLINDER)
@@ -366,7 +375,6 @@ t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int 
 		{
 			t = tmp;
 			hit.obj = objects[i];
-			// printf("Хит!");
 		}
 	}
 	if (hit.obj.type == NONE)
@@ -381,7 +389,7 @@ float			spec(t_hit hit, t_ray light_ray, t_ray ray_arr)
 	cl_float3	spec_ray;
 
 	spec_ray = ((hit.norm * v_cos(hit.norm, light_ray.dir * -1)) - light_ray.dir * -1) + hit.norm;
-	return (equalizer(pown(v_cos(spec_ray, normalize(ray_arr.orig - hit.pos)), 20), 0., 1.));
+	return (equalizer(pown(v_cos(spec_ray, fast_normalize(ray_arr.orig - hit.pos)), 20), 0., 1.));
 }
 
 float				objects_intersect_shadows(const t_ray ray, __global t_obj *objects, const int obj_count, float t)
@@ -414,15 +422,15 @@ int				shadows(__global t_obj *obj, const int obj_count, __global t_light *light
 	{
 		light_ray.orig = light[i].pos;
 		light_ray.dir = hit.pos - light[i].pos;
-		t = length(light_ray.dir) - 1;
-		light_ray.dir = normalize(light_ray.dir);
+		t = fast_length(light_ray.dir) - 1;
+		light_ray.dir = fast_normalize(light_ray.dir);
 
 		buf = fabs(t - objects_intersect_shadows(light_ray, obj, obj_count, t));
 		if (buf < 0.000001)
 		{
 			rev_light_dir = light_ray.dir * -1;
 			// difuse coef
-			sum[3] += (light[i].intensity / 100) * hit.obj.difuse * pown(dot(rev_light_dir, hit.norm) / (length(rev_light_dir) * length(hit.norm)), 1);
+			sum[3] += (light[i].intensity / 100) * hit.obj.difuse * pown(dot(rev_light_dir, hit.norm) / (fast_length(rev_light_dir) * fast_length(hit.norm)), 1);
 			// specularity coef
 			// sum[3] += spec(hit, light_ray, ray_arr);
 			// distanse coef
@@ -432,16 +440,19 @@ int				shadows(__global t_obj *obj, const int obj_count, __global t_light *light
 			// sum[3] = sum[3] * (1.0/(sqrt(t)));
 			//	printf("equ = %f\n", sum[3]);
 
-			sum[0] += (((light[i].color.red / 255.0) * (hit.obj.color.red / 255.0))) * sum[3];
-			sum[1] += (((light[i].color.green / 255.0) * (hit.obj.color.green / 255.0))) * sum[3];		
-			sum[2] += (((light[i].color.blue / 255.0) * (hit.obj.color.blue / 255.0))) * sum[3];
+			sum[0] += (((light[i].fcolor.red) * (hit.obj.fcolor.red))) * sum[3];
+			sum[1] += (((light[i].fcolor.green) * (hit.obj.fcolor.green))) * sum[3];
+			sum[2] += (((light[i].fcolor.blue) * (hit.obj.fcolor.blue))) * sum[3];
+			// sum[0] += (((light[i].color.red / 255.0) * (hit.obj.color.red / 255.0))) * sum[3];
+			// sum[1] += (((light[i].color.green / 255.0) * (hit.obj.color.green / 255.0))) * sum[3];
+			// sum[2] += (((light[i].color.blue / 255.0) * (hit.obj.color.blue / 255.0))) * sum[3];
 		}
 	}
 
 	sum[4] = ambient / 100.;
-	sum[0] < ((hit.obj.color.red / 255.0) * sum[4]) ? sum[0] = ((hit.obj.color.red / 255.0) * sum[4]) : 0;
-	sum[1] < ((hit.obj.color.green / 255.0) * sum[4]) ? sum[1] = ((hit.obj.color.green / 255.0) * sum[4]) : 0;
-	sum[2] < ((hit.obj.color.blue / 255.0) * sum[4]) ? sum[2] = ((hit.obj.color.blue / 255.0) * sum[4]) : 0;
+	sum[0] < ((hit.obj.fcolor.red) * sum[4]) ? sum[0] = ((hit.obj.fcolor.red) * sum[4]) : 0;
+	sum[1] < ((hit.obj.fcolor.green) * sum[4]) ? sum[1] = ((hit.obj.fcolor.green) * sum[4]) : 0;
+	sum[2] < ((hit.obj.fcolor.blue) * sum[4]) ? sum[2] = ((hit.obj.fcolor.blue) * sum[4]) : 0;
 
 	sum[0] = equalizer(sum[0], 0.0, 1.0);
 	sum[1] = equalizer(sum[1], 0.0, 1.0);

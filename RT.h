@@ -58,7 +58,12 @@ typedef struct	s_color
 	short		blue;
 }				t_color;
 
-
+typedef struct	s_fcolor
+{
+	float		red;
+	float		green;
+	float		blue;
+}				t_fcolor;
 
 typedef struct	s_ray
 {
@@ -71,6 +76,7 @@ typedef struct	s_light
 	cl_float3	pos;
 	float		intensity;
 	t_color		color;
+	t_fcolor	fcolor;
 }				t_light;
 
 typedef struct	s_obj
@@ -79,6 +85,7 @@ typedef struct	s_obj
 	cl_float3	rot;
 	int			radius;
 	t_color		color;
+	t_fcolor	fcolor;
 	int			type;
 	float		difuse;
 
@@ -192,6 +199,7 @@ void	scene_set_lights(t_scene *sc, xmlNodePtr cur);
 /*
 ** utils.c
 */
+t_fcolor	get_fcolor(t_color color);
 void	pixel_put(int color);
 void	ft_err(char *err, int status);
 void	set_tabs(int n);

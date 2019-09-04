@@ -37,6 +37,7 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 		}
 		child = child->next;
 	}
+	sc->objects[i].fcolor = get_fcolor(sc->objects[i].color);
 }
 
 void	scene_set_objects(t_scene *sc, xmlNodePtr root)
@@ -105,6 +106,8 @@ void	set_light(t_scene *sc, xmlNodePtr obj, int i)
 		}
 		child = child->next;
 	}
+	sc->lights[i].fcolor = get_fcolor(sc->lights[i].color);
+
 }
 
 void	scene_set_lights(t_scene *sc, xmlNodePtr cur)
