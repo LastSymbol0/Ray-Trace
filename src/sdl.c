@@ -68,3 +68,37 @@ void	sdl_put_pixel(t_scene *sc, int x, int y, int color)
 {
 	sc->sdl->pixel[y * WIDTH + x] = color < 0 ? 0 : color;
 }
+
+void saveScreenshotBMP(t_scene *sc) {
+    SDL_Surface *saveSurface = NULL;
+    SDL_Surface *infoSurface = NULL;
+    infoSurface = SDL_GetWindowSurface(sc->sdl->window);
+    if (infoSurface == NULL) {
+        ft_err("err screenshot", 1);// std::cerr << "Failed to create info surface from window in saveScreenshotBMP(string), SDL_GetError() - " << SDL_GetError() << "\n";
+    } else {
+        unsigned char *pixels = (unsigned char *)ft_memalloc(infoSurface->w * infoSurface->h * infoSurface->format->BytesPerPixel);
+        if (pixels == 0) {
+            ft_err("err screenshot1", 1);// std::cerr << "Unable to allocate memory for screenshot pixel data buffer!\n";
+            return ;
+        } else {
+            if (SDL_RenderReadPixels(sc->sdl->render, &infoSurface->clip_rect, infoSurface->format->format, pixels, infoSurface->w * infoSurface->format->BytesPerPixel) != 0) {
+                ft_err("err screenshot2", 1);// std::cerr << "Failed to read pixel data from SDL_Renderer object. SDL_GetError() - " << SDL_GetError() << "\n";
+                pixels = NULL;
+                return ;
+            } else {
+                saveSurface = SDL_CreateRGBSurfaceFrom(pixels, infoSurface->w, infoSurface->h, infoSurface->format->BitsPerPixel, infoSurface->w * infoSurface->format->BytesPerPixel, infoSurface->format->Rmask, infoSurface->format->Gmask, infoSurface->format->Bmask, infoSurface->format->Amask);
+                if (saveSurface == NULL) {
+                    ft_err("err screenshot3", 1);// std::cerr << "Couldn't create SDL_Surface from renderer pixel data. SDL_GetError() - " << SDL_GetError() << "\n";
+                    return ;
+                }
+                SDL_SaveBMP(saveSurface, "RT_screen.bpm");
+                SDL_FreeSurface(saveSurface);
+                saveSurface = NULL;
+            }
+            // delete[] pixels;
+        }
+        SDL_FreeSurface(infoSurface);
+        infoSurface = NULL;
+    }
+    // return true;
+}

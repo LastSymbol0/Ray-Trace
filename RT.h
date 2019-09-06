@@ -160,6 +160,7 @@ t_SDL		*sdl_init(t_scene *sc);
 void		sdl_draw(t_scene *sc);
 void		sdl_destroy(t_scene *sc);
 void		sdl_put_pixel(t_scene *sc, int x, int y, int color);
+void saveScreenshotBMP(t_scene *sc);
 
 t_OpenCL	*init_ocl(void);
 void		set_ray_arr_ocl(t_scene *sc);

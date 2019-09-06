@@ -6,7 +6,7 @@
 /*   By: vsusol <vsusol@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/11 17:28:37 by aillia            #+#    #+#             */
-/*   Updated: 2019/09/03 15:36:00 by vsusol           ###   ########.fr       */
+/*   Updated: 2019/09/05 18:11:11 by vsusol           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	set_ray_arr(t_scene *sc)
 void	ray_trace_ocl(t_scene *sc)
 {
 
-	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "main_f");
+	object_intersect_build_ocl_source(sc, read_file("src/object_intersect.cl", 65534), "ray_cast");
 	OCL[1].output = (cl_mem*)malloc(sizeof(cl_mem) * 5);
 	OBJECTS_BUFF = clCreateBuffer(OCL[1].context, CL_MEM_READ_ONLY,
 			sizeof(t_obj) * (sc->obj_count), NULL, &OCL[1].err);
@@ -220,6 +220,11 @@ int		main(int ac, char **av)
 					sc->thread.end = clock();
 					sdl_draw(sc);
 					sc->thread.end = clock();
+				}
+				else if(SDL_SCANCODE_S == sc->sdl->event.key.keysym.scancode)
+				{
+					printf("dsds\n");
+					saveScreenshotBMP(sc);
 				}
 		sdl_destroy(sc);
 	}

@@ -113,7 +113,6 @@ float				spec(t_hit hit, t_ray light_ray, t_ray ray_arr);
 t_ray				get_reflect_ray(t_hit hit);
 
 
-
 /*********************************************************************************/
 /* Vec */
 
@@ -353,14 +352,14 @@ void					set_norm(t_hit *hit)
 	else if (hit->obj.type == PLANE)
 		hit->norm = hit->obj.rot;
 	else if (hit->obj.type == CYLINDER)
-		hit->norm = cross(cross(hit->obj.rot, hit->pos - hit->obj.pos), hit->obj.rot);
+		hit->norm = fast_normalize(cross(cross(hit->obj.rot, hit->pos - hit->obj.pos), hit->obj.rot));
 	else if (hit->obj.type == CONE)
 	{
 		buf = hit->pos - hit->obj.pos;
 		if (v_cos(buf, hit->obj.rot) < 0)
-			hit->norm = cross(cross((hit->obj.rot * -1), buf), buf);
+			hit->norm = fast_normalize(cross(cross((hit->obj.rot * -1), buf), buf));
 		else
-			hit->norm = cross(cross(hit->obj.rot, buf), buf);
+			hit->norm = fast_normalize(cross(cross(hit->obj.rot, buf), buf));
 	} 
 }
 
@@ -385,7 +384,7 @@ t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int 
 	if (hit.obj.type == NONE)
 		return (hit);
 	hit.pos = (ray.dir * t) + ray.orig;
-	hit.hit_v = hit.pos - ray.orig;
+	hit.hit_v = ray.dir * t;
 	set_norm(&hit);
 	return (hit);
 }
@@ -394,7 +393,9 @@ float			spec(t_hit hit, t_ray light_ray, t_ray ray_arr)
 {
 	cl_float3	spec_ray;
 
-	spec_ray = ((hit.norm * v_cos(hit.norm, light_ray.dir * -1)) - light_ray.dir * -1) + hit.norm;
+	// spec_ray = ((hit.norm * v_cos(hit.norm, light_ray.dir * -1)) - light_ray.dir * -1) + hit.norm;
+	// spec_ray = -light_ray.dir + hit.norm;
+	spec_ray = light_ray.dir - (2 * hit.norm * dot(light_ray.dir, hit.norm));
 	return (equalizer(pown(v_cos(spec_ray, fast_normalize(ray_arr.orig - hit.pos)), 20), 0., 1.));
 }
 
@@ -404,6 +405,7 @@ t_ray			get_reflect_ray(t_hit hit)
 
 	reflect_ray.dir = normalize(hit.norm + (normalize(hit.hit_v) * -1));
 	reflect_ray.orig = hit.pos + reflect_ray.dir;
+	reflect_ray.dir = normalize(hit.hit_v - (2 * hit.norm * dot(hit.hit_v, hit.norm)));
 	// reflect_ray.dir = normalize(((hit.norm * v_cos(hit.norm, hit.pos * -1)) - hit.pos * -1) + hit.norm);
 	return (reflect_ray);
 }
@@ -420,15 +422,16 @@ float				objects_intersect_shadows(const t_ray ray, __global t_obj *objects, con
 	return (t);
 }
 
-t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray_arr)
+t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray)
 {
 	int				i;
 	float			t;
 	float			buf;
 	float			sum[5];
-	t_fcolor			res;
+	t_fcolor		res;
 	t_ray			light_ray;
 	cl_float3		rev_light_dir;
+	// float			p;
 
 	sum[0] = 0;
 	sum[1] = 0;
@@ -445,21 +448,22 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 		buf = fabs(t - objects_intersect_shadows(light_ray, obj, obj_count, t));
 		if (buf < 0.000001)
 		{
+			sum[3] = ambient / 100.;
 			rev_light_dir = light_ray.dir * -1;
 			// difuse coef
-			sum[3] += (light[i].intensity / 100) * hit.obj.difuse * pown(dot(rev_light_dir, hit.norm) / (fast_length(rev_light_dir) * fast_length(hit.norm)), 1);
+			sum[3] += equalizer((light[i].intensity / 100) * hit.obj.difuse * pown(dot(rev_light_dir, hit.norm) / (fast_length(rev_light_dir) * fast_length(hit.norm)), 1), 0.0, 100.);
 			// specularity coef
-			sum[3] += spec(hit, light_ray, ray_arr);
+			sum[3] += spec(hit, light_ray, ray);
 			// distanse coef
-			sum[3] = equalizer(sum[3] * PLUS_INTENSE_LIGHT * equalizer(1.0 / sqrt(t), 0.0, 1.0), 0.0, 1.0);
+			sum[3] = equalizer(sum[3] * PLUS_INTENSE_LIGHT * equalizer(1.0 / sqrt(t), 0.0, 1.0), ambient / 100., 1.0);
 
 			// drugoi distanse coef
 			// sum[3] = sum[3] * (1.0/(sqrt(t)));
 			//	printf("equ = %f\n", sum[3]);
 
-			sum[0] += (((light[i].fcolor.red) * (hit.obj.fcolor.red))) * sum[3];
-			sum[1] += (((light[i].fcolor.green) * (hit.obj.fcolor.green))) * sum[3];
-			sum[2] += (((light[i].fcolor.blue) * (hit.obj.fcolor.blue))) * sum[3];
+			sum[0] += light[i].fcolor.red * hit.obj.fcolor.red * sum[3];
+			sum[1] += light[i].fcolor.green * hit.obj.fcolor.green * sum[3];
+			sum[2] += light[i].fcolor.blue * hit.obj.fcolor.blue * sum[3];
 			// sum[0] += (((light[i].color.red / 255.0) * (hit.obj.color.red / 255.0))) * sum[3];
 			// sum[1] += (((light[i].color.green / 255.0) * (hit.obj.color.green / 255.0))) * sum[3];
 			// sum[2] += (((light[i].color.blue / 255.0) * (hit.obj.color.blue / 255.0))) * sum[3];
@@ -479,59 +483,74 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 	return (res);
 }
 
-int					ray_cast(t_ray ray, __global t_obj *objects, __global t_light *light, const int obj_count, __global unsigned int *pixels, const int light_count, const float ambient)
+t_fcolor			make_coef_fcolor(t_fcolor fcolor, float k)
 {
-	t_fcolor	fcolor;
-	t_color		color;
-	int			res = 0;
-	t_hit		hit;
-	int			reflection_count;
+	fcolor.red *= k;
+	fcolor.green *= k;
+	fcolor.blue *= k;
 
-	hit = objects_intersect(ray, objects, obj_count);
-	if (hit.obj.type == NONE)
-		return (0);
-	fcolor = shadows(objects, obj_count, light, light_count, hit, ambient, ray);
-	color.red = fcolor.red * 150.;
-	color.green = fcolor.green * 150.;
-	color.blue = fcolor.blue * 150.;
-	reflection_count = hit.obj.reflection_count;
-	while (reflection_count > 0)
-	{
-		ray = get_reflect_ray(hit);
-		hit = objects_intersect(ray, objects, obj_count);
-		if (hit.obj.type == NONE)
-			break ;
-		fcolor = shadows(objects, obj_count, light, light_count, hit, ambient, ray);
-		// fcolor = hit.obj.fcolor;
-		color.red += fcolor.red * 40.;
-		color.green += fcolor.green * 40.;
-		color.blue += fcolor.blue * 40.;
-		reflection_count--;
-	}
-
-	res += (int)color.red << 16;
-	res += (int)color.green << 8;
-	res += (int)color.blue;
-	// if (get_global_id(0) < 100)
-		// printf("Color: %d\n", res);
-	return (res);
-	
+	return (fcolor);
 }
 
-__kernel void		main_f(__global t_ray *ray_arr, __global t_obj *objects, __global t_light *light, const int obj_count, __global unsigned int *pixels, const int light_count, const float ambient)
+t_fcolor			add_fcolor(t_fcolor a, t_fcolor b)
+{
+	a.red += b.red;
+	a.green += b.green;
+	a.blue += b.blue;
+	
+	return (a);
+}
+
+t_fcolor			norme_fcolor(t_fcolor fcolor)
+{
+	fcolor.red = equalizer(fcolor.red, 0.0, 1.0);
+	fcolor.green = equalizer(fcolor.green, 0.0, 1.0);
+	fcolor.blue = equalizer(fcolor.blue, 0.0, 1.0);
+	return (fcolor);
+}
+
+t_fcolor			refcletions(t_fcolor prev_fcolor, __global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray)
+{
+	t_fcolor	res_fcolor;
+	int			reflection_count;
+	float		reflection_intens;
+	int			max_reflections = 4;
+
+	if (hit.obj.reflection_count == 0)
+		return (prev_fcolor);
+	res_fcolor = make_coef_fcolor(prev_fcolor, 1 - hit.obj.reflection_coef);
+	while (max_reflections-- != 0)
+	{
+		reflection_intens = hit.obj.reflection_coef;
+		ray = get_reflect_ray(hit);
+		hit = objects_intersect(ray, obj, obj_count);
+		if (hit.obj.type == NONE || hit.obj.reflection_count == 0)
+			break ;
+		res_fcolor = add_fcolor(res_fcolor, make_coef_fcolor(shadows(obj, obj_count, light, light_count, hit, ambient, ray), reflection_intens));
+	}
+	return (norme_fcolor(res_fcolor));
+}
+
+int					color(__global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray)
+{
+	t_fcolor	fcolor;
+	
+	fcolor = shadows(obj, obj_count, light, light_count, hit, ambient, ray);
+	fcolor = refcletions(fcolor, obj, obj_count, light, light_count, hit, ambient, ray);
+	return (((int)(fcolor.red * 255)  << 16) | (((int)(fcolor.green * 255)) << 8) | (int)(fcolor.blue * 255));
+}
+
+__kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, __global t_light *light, const int obj_count, __global unsigned int *pixels, const int light_count, const float ambient)
 {
 	int		i;
-	// t_hit	hit;
+	t_hit 	hit;
 
-	if (get_global_id(0) == 1)
-		printf("Hello\n");
 	i = get_global_id(0);
-	pixels[i] = ray_cast(ray_arr[i], objects, light, obj_count, pixels, light_count, ambient);
-	// hit = objects_intersect(ray_arr[i], objects, obj_count);
-	// if (hit.obj.type != NONE)
-	// {
-		// pixels[i] = shadows(objects, obj_count, light, light_count, hit, ambient, ray_arr[i]);
-	// }
-	// else 
-		// pixels[i] = 0;
+	hit = objects_intersect(ray_arr[i], objects, obj_count);
+	if (hit.obj.type != NONE)
+	{
+		pixels[i] = color(objects, obj_count, light, light_count, hit, ambient, ray_arr[i]);
+	}
+	else 
+		pixels[i] = 0;
 }

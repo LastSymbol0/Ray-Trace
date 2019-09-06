@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<scene name="test_sc" width="2000" height="800" ambient="1" max_reflections="4">
+<scene name="test_sc" width="2000" height="1000" ambient="0" max_reflections="4">
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 1,1,1 </rot> 
@@ -103,14 +103,14 @@
 		<rot> 0,1,0 </rot>
 		<radius> 6 </radius>
 		<color> 01dd0d </color>
-		<difuse>100</difuse>
+		<difuse>70</difuse>
 	</cylinder>
 	<cylinder> 3
 		<pos> ,0,70 </pos>
 		<rot> 0,1,0 </rot>
 		<radius> 6 </radius>
 		<color> 01dd0d </color>
-		<difuse>100</difuse>
+		<difuse>70</difuse>
 	</cylinder>
 
 	<cone> 
@@ -118,7 +118,7 @@
 		<rot> 0,1,0 </rot>
 		<radius> 1 </radius>
 		<color> fddddd </color>
-		<difuse>100</difuse>
+		<difuse>70</difuse>
 	</cone>
 	<cone>
 		<pos> 65,0,70 </pos>
@@ -138,12 +138,12 @@
 	<light>
 		<pos> 80,0,100 </pos>
 		<intensity> 100 </intensity>
-		<color> ff1f1f </color>
+		<color> ffffff </color>
 	</light>
 	<light>
 		<pos> -60,0,100 </pos>
 		<intensity> 100 </intensity>
-		<color> ffd1e2 </color>
+		<color> ffffff </color>
 	</light>
 </scene>
   
