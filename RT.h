@@ -92,6 +92,7 @@ typedef struct	s_obj
 	int			type;
 	float		difuse;
 	float		reflection_coef;
+	float		transparency_coef;
 
 	float		t;
 }				t_obj;

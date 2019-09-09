@@ -90,29 +90,8 @@
 		<color> 01dd0d </color>
 		<difuse>100</difuse>
 	</cylinder>
-	<cylinder> -
-		<pos> 0,0,0 </pos>
-		<rot> 0,1,0 </rot>
-		<radius> 6 </radius>
-		<color> 01dd0d </color>
-		<difuse>100</difuse>
-	</cylinder>
-	<cylinder> 
-		<pos> 0,0,0 </pos>
-		<rot> 0,1,0 </rot>
-		<radius> 6 </radius>
-		<color> 01dd0d </color>
-		<difuse>100</difuse>
-	</cylinder>
-	<cylinder> -3
-		<pos> ,0,70 </pos>
-		<rot> 0,1,0 </rot>
-		<radius> 6 </radius>
-		<color> 01dd0d </color>
-		<difuse>70</difuse>
-	</cylinder>
-	<cylinder> 3
-		<pos> ,0,70 </pos>
+	<cylinder>
+		<pos> 0,0,70 </pos>
 		<rot> 0,1,0 </rot>
 		<radius> 6 </radius>
 		<color> 01dd0d </color>
@@ -152,4 +131,3 @@
 		<color> ffffff </color>
 	</light>
 </scene>
-  

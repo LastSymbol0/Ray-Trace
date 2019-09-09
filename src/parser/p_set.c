@@ -39,10 +39,12 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 		}
 		child = child->next;
 	}
-	// sc->objects[i].reflection_coef = 0.5;
+	sc->objects[i].reflection_coef = 0.5;
 	// sc->objects[i].reflection_count = 0;
 	// if (type == SPHERE)
 		// sc->objects[i].reflection_count = 1;
+	if (type == SPHERE)
+		sc->objects[i].transparency_coef = 0.7;
 	sc->objects[i].fcolor = get_fcolor(sc->objects[i].color);
 }
 

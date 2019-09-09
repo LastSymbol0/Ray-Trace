@@ -56,6 +56,8 @@ typedef struct		s_obj
 	int				type;
 	float			difuse;
 	float			reflection_coef;
+	float			transparency_coef;
+
 
 	float			t;
 }					t_obj;
@@ -79,7 +81,9 @@ typedef struct		s_hit
 	t_obj			obj;
 	cl_float3		pos;
 	cl_float3		hit_v;
+	cl_float3		hit_v_norm;
 	cl_float3		norm;
+	global t_obj	*addr_obj;
 }					t_hit;
 
 // cl_float3			v_minus(cl_float3v1, cl_float3v2);
@@ -103,7 +107,7 @@ float				cone_intersect(const t_ray ray, const t_obj cone);
 float				plane_intersect(const t_ray ray, const t_obj plane);
 
 float				object_intersect(const t_ray ray, const t_obj object);
-t_hit				objects_intersect(const t_ray ray, global t_obj *objects, const int obj_count);
+t_hit				objects_intersect(const t_ray ray, global t_obj *objects, const int obj_count, t_hit prev_hit);
 
 t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray_arr);
 float				objects_intersect_shadows(const t_ray ray, __global t_obj *objects, const int obj_count, float t);
@@ -362,7 +366,7 @@ void					set_norm(t_hit *hit)
 	} 
 }
 
-t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int obj_count)
+t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int obj_count, t_hit prev_hit)
 {
 	int	i;
 	float	t;
@@ -374,16 +378,19 @@ t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int 
 	t = 2147483647;
 	while (++i < obj_count)
 	{
-		if ((tmp = object_intersect(ray, objects[i])) > 0 && tmp < t)
+		if ((tmp = object_intersect(ray, objects[i])) > 0 && tmp < t && &objects[i] != prev_hit.addr_obj)
 		{
 			t = tmp;
 			hit.obj = objects[i];
+			hit.addr_obj = &objects[i];
 		}
 	}
 	if (hit.obj.type == NONE)
 		return (hit);
 	hit.pos = (ray.dir * t) + ray.orig;
+	t += 1;
 	hit.hit_v = ray.dir * t;
+	hit.hit_v_norm = ray.dir;
 	set_norm(&hit);
 	return (hit);
 }
@@ -402,9 +409,9 @@ t_ray			get_reflect_ray(t_hit hit)
 {
 	t_ray	reflect_ray;
 
-	reflect_ray.dir = normalize(hit.norm + (normalize(hit.hit_v) * -1));
-	reflect_ray.orig = hit.pos + reflect_ray.dir;
-	reflect_ray.dir = normalize(hit.hit_v - (2 * hit.norm * dot(hit.hit_v, hit.norm)));
+	// reflect_ray.dir = normalize(hit.norm + (hit.hit_v * -1));
+	reflect_ray.dir = normalize(hit.hit_v_norm - (2 * hit.norm * dot(hit.hit_v_norm, hit.norm)));
+	reflect_ray.orig = hit.pos;
 	// reflect_ray.dir = normalize(((hit.norm * v_cos(hit.norm, hit.pos * -1)) - hit.pos * -1) + hit.norm);
 	return (reflect_ray);
 }
@@ -441,7 +448,7 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 	{
 		light_ray.orig = light[i].pos;
 		light_ray.dir = hit.pos - light[i].pos;
-		t = fast_length(light_ray.dir) - 1;
+		t = fast_length(light_ray.dir) - 0.1;
 		light_ray.dir = fast_normalize(light_ray.dir);
 
 		buf = fabs(t - objects_intersect_shadows(light_ray, obj, obj_count, t));
@@ -513,7 +520,7 @@ t_fcolor			refcletions(t_fcolor prev_fcolor, __global t_obj *obj, const int obj_
 	t_fcolor	res_fcolor;
 	int			reflection_count;
 	float		reflection_intens;
-	int			max_reflections = 2;
+	int			max_reflections = 3;
 
 	if (hit.obj.reflection_coef == 0.)
 		return (prev_fcolor);
@@ -522,12 +529,30 @@ t_fcolor			refcletions(t_fcolor prev_fcolor, __global t_obj *obj, const int obj_
 	{
 		reflection_intens = hit.obj.reflection_coef;
 		ray = get_reflect_ray(hit);
-		hit = objects_intersect(ray, obj, obj_count);
+		hit = objects_intersect(ray, obj, obj_count, hit);
 		// return(shadows(obj, obj_count, light, light_count, hit, ambient, ray));
 		// if (hit.obj.type == NONE || hit.obj.reflection_count == 0)
 			// break ;
-		res_fcolor = add_fcolor(res_fcolor, make_coef_fcolor(shadows(obj, obj_count, light, light_count, hit, ambient, ray), reflection_intens));
+		res_fcolor = add_fcolor(res_fcolor, make_coef_fcolor(shadows(obj, obj_count, light, light_count, hit, ambient, ray), reflection_intens * (1 - hit.obj.transparency_coef)));
 		// res_fcolor = shadows(obj, obj_count, light, light_count, hit, ambient, ray);
+	}
+	return (norme_fcolor(res_fcolor));
+}
+
+t_fcolor			transparency(t_fcolor prev_fcolor, __global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray)
+{
+	t_fcolor	res_fcolor;
+	float		transparency_coef;
+
+	if (hit.obj.transparency_coef <= 0.)
+		return (prev_fcolor);
+	res_fcolor = make_coef_fcolor(prev_fcolor, 1 - hit.obj.transparency_coef);
+	while (hit.obj.type != NONE && hit.obj.transparency_coef != 0.)
+	{
+		transparency_coef = hit.obj.transparency_coef;
+		ray.orig = hit.pos;
+		hit = objects_intersect(ray, obj, obj_count, hit);
+		res_fcolor = add_fcolor(res_fcolor, make_coef_fcolor(shadows(obj, obj_count, light, light_count, hit, ambient, ray), transparency_coef));
 	}
 	return (norme_fcolor(res_fcolor));
 }
@@ -537,6 +562,7 @@ int					color(__global t_obj *obj, const int obj_count, __global t_light *light,
 	t_fcolor	fcolor;
 	
 	fcolor = shadows(obj, obj_count, light, light_count, hit, ambient, ray);
+	fcolor = transparency(fcolor, obj, obj_count, light, light_count, hit, ambient, ray);
 	fcolor = refcletions(fcolor, obj, obj_count, light, light_count, hit, ambient, ray);
 	return (((int)(fcolor.red * 255)  << 16) | (((int)(fcolor.green * 255)) << 8) | (int)(fcolor.blue * 255));
 }
@@ -547,7 +573,8 @@ __kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, __glob
 	t_hit 	hit;
 
 	i = get_global_id(0);
-	hit = objects_intersect(ray_arr[i], objects, obj_count);
+	hit.addr_obj = 0;
+	hit = objects_intersect(ray_arr[i], objects, obj_count, hit);
 	if (hit.obj.type != NONE)
 	{
 		pixels[i] = color(objects, obj_count, light, light_count, hit, ambient, ray_arr[i]);
