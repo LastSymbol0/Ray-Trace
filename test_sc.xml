@@ -4,25 +4,31 @@
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 1,1,1 </rot> 
-		<color> 0000aa </color>
+		<!-- <color> 0000aa </color> -->
+		<color> ffffff </color>
+		<reflection_coef>100</reflection_coef>
 		<difuse>100</difuse>
 	</plane>
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 0,0,1 </rot> 
-		<color> ff0a0a </color>
+		<!-- <color> ff0a0a </color> -->
+		<color> ffffff </color>
 		<difuse>100</difuse>
 	</plane>
 	<plane>
 		<pos> 0,35,0 </pos>
 		<rot>0,-10,0 </rot>
-		<color>  0ddddd; </color>
+		<!-- <color>  0ddddd; </color> -->
+		<color> ffffff </color>
 		<difuse>100</difuse>
 	</plane>
 	<plane>
 		<pos> 0,-35,0 </pos>
 		<rot> 0,10,0 </rot>
-		<color>  aa00ff </color>
+		<!-- <color>  aa00ff </color> -->
+				<color> ffffff </color>
+
 		<difuse>100</difuse>
 	</plane>
 
@@ -132,7 +138,7 @@
 		<rot> -1,0,-1 </rot>
 	</cam> -->
 	<cam>
-		<pos> 0,0,150 </pos>
+		<pos> 0,0,200 </pos>
 		<rot> 0,0,0 </rot>
 	</cam>
 	<light>

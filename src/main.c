@@ -223,8 +223,9 @@ int		main(int ac, char **av)
 				}
 				else if(SDL_SCANCODE_S == sc->sdl->event.key.keysym.scancode)
 				{
-					printf("dsds\n");
+					// printf("dsds\n");
 					saveScreenshotBMP(sc);
+					sc->sdl->event.key.keysym.scancode = SDL_SCANCODE_F;
 				}
 		sdl_destroy(sc);
 	}

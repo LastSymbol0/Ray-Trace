@@ -56,7 +56,6 @@ typedef struct		s_obj
 	int				type;
 	float			difuse;
 	float			reflection_coef;
-	short			reflection_count;
 
 	float			t;
 }					t_obj;
@@ -514,19 +513,21 @@ t_fcolor			refcletions(t_fcolor prev_fcolor, __global t_obj *obj, const int obj_
 	t_fcolor	res_fcolor;
 	int			reflection_count;
 	float		reflection_intens;
-	int			max_reflections = 4;
+	int			max_reflections = 2;
 
-	if (hit.obj.reflection_count == 0)
+	if (hit.obj.reflection_coef == 0.)
 		return (prev_fcolor);
 	res_fcolor = make_coef_fcolor(prev_fcolor, 1 - hit.obj.reflection_coef);
-	while (max_reflections-- != 0)
+	while (max_reflections-- != 0 && hit.obj.type != NONE && hit.obj.reflection_coef != 0.)
 	{
 		reflection_intens = hit.obj.reflection_coef;
 		ray = get_reflect_ray(hit);
 		hit = objects_intersect(ray, obj, obj_count);
-		if (hit.obj.type == NONE || hit.obj.reflection_count == 0)
-			break ;
+		// return(shadows(obj, obj_count, light, light_count, hit, ambient, ray));
+		// if (hit.obj.type == NONE || hit.obj.reflection_count == 0)
+			// break ;
 		res_fcolor = add_fcolor(res_fcolor, make_coef_fcolor(shadows(obj, obj_count, light, light_count, hit, ambient, ray), reflection_intens));
+		// res_fcolor = shadows(obj, obj_count, light, light_count, hit, ambient, ray);
 	}
 	return (norme_fcolor(res_fcolor));
 }

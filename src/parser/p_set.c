@@ -31,16 +31,18 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 			else if (ft_strequ((char *)child->name, "color"))
 				sc->objects[i].color = parse_color((char *)xmlNodeGetContent(child));
 			else if (ft_strequ((char *)child->name, "difuse"))
-				sc->objects[i].difuse = LOWER_THEN_1(ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
+				sc->objects[i].difuse = FROM_0_TO_1(ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
+			else if (ft_strequ((char *)child->name, "reflection_coef"))
+				sc->objects[i].reflection_coef = FROM_0_TO_1(ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
 			else
 				ft_err(ft_strjoin("Undefined object argument: ", (char *)child->name), 1);
 		}
 		child = child->next;
 	}
-	sc->objects[i].reflection_coef = 0.5;
-	sc->objects[i].reflection_count = 0;
+	// sc->objects[i].reflection_coef = 0.5;
+	// sc->objects[i].reflection_count = 0;
 	// if (type == SPHERE)
-		sc->objects[i].reflection_count = 2;
+		// sc->objects[i].reflection_count = 1;
 	sc->objects[i].fcolor = get_fcolor(sc->objects[i].color);
 }
 

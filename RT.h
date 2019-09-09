@@ -40,6 +40,9 @@
 # define MAX_OBJ_COUNT 50
 
 # define LOWER_THEN_1(a) (((a) < 1) ? (a) : 1)
+# define BIGGER_THEN_0(a) (((a) > 0) ? (a) : 0)
+# define LOWER_THEN_1(a) (((a) < 1) ? (a) : 1)
+# define FROM_0_TO_1(a) BIGGER_THEN_0(LOWER_THEN_1((a)))
 
 
 enum			e_typeobject
@@ -89,7 +92,6 @@ typedef struct	s_obj
 	int			type;
 	float		difuse;
 	float		reflection_coef;
-	short		reflection_count;
 
 	float		t;
 }				t_obj;

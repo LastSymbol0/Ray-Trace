@@ -100,7 +100,7 @@ __kernel void	set_ray_arr(const int height, const int width, __global float3 *ca
 	int		i;
 
 	i = get_global_id(0);
-	fov = M_PI / 3.;
+	fov = M_PI / 4.;
 	x1 = (2 * ((i % width) + 0.5) / (float)width - 1) * tan(fov / 2) * (float)width / (float)height;
 	y1 = -(2 * ((i / width) + 0.5) / (float)height - 1) * tan(fov / 2);
 	results[i].dir = normalize(v_matrix(normalize((float3)(x1, y1, -1)),cam_rot));

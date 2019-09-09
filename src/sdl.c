@@ -44,7 +44,8 @@ t_SDL	*sdl_init(t_scene *sc)
 	if (SDL_Init(SDL_INIT_EVERYTHING))
 		ft_err("SDL init error", 1);
 	sdl->window = SDL_CreateWindow(sc->name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS);
-	sdl->render = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_ACCELERATED);
+	sdl->surface = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0);
+	sdl->render = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_SOFTWARE);
 	sdl->texture = SDL_CreateTexture(sdl->render, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
 	return (sdl);
 }
@@ -74,6 +75,7 @@ void saveScreenshotBMP(t_scene *sc) {
     SDL_Surface *infoSurface = NULL;
     infoSurface = SDL_GetWindowSurface(sc->sdl->window);
     if (infoSurface == NULL) {
+		printf("%s\n", SDL_GetError());
         ft_err("err screenshot", 1);// std::cerr << "Failed to create info surface from window in saveScreenshotBMP(string), SDL_GetError() - " << SDL_GetError() << "\n";
     } else {
         unsigned char *pixels = (unsigned char *)ft_memalloc(infoSurface->w * infoSurface->h * infoSurface->format->BytesPerPixel);
@@ -91,7 +93,7 @@ void saveScreenshotBMP(t_scene *sc) {
                     ft_err("err screenshot3", 1);// std::cerr << "Couldn't create SDL_Surface from renderer pixel data. SDL_GetError() - " << SDL_GetError() << "\n";
                     return ;
                 }
-                SDL_SaveBMP(saveSurface, "RT_screen.bpm");
+                SDL_SaveBMP(saveSurface, "RT_screen.bmp");
                 SDL_FreeSurface(saveSurface);
                 saveSurface = NULL;
             }
