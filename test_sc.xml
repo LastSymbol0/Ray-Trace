@@ -4,31 +4,30 @@
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 1,1,1 </rot> 
-		<!-- <color> 0000aa </color> -->
-		<color> ffffff </color>
+		<color> 0000aa </color>
+		<!-- <color> ffffff </color> -->
 		<reflection_coef>100</reflection_coef>
 		<difuse>100</difuse>
 	</plane>
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 0,0,1 </rot> 
-		<!-- <color> ff0a0a </color> -->
-		<color> ffffff </color>
+		<color> ff0a0a </color>
+		<!-- <color> ffffff </color> -->
 		<difuse>100</difuse>
 	</plane>
 	<plane>
 		<pos> 0,35,0 </pos>
 		<rot>0,-10,0 </rot>
-		<!-- <color>  0ddddd; </color> -->
-		<color> ffffff </color>
+		<color>  0ddddd; </color>
+		<!-- <color> ffffff </color> -->
 		<difuse>100</difuse>
 	</plane>
 	<plane>
 		<pos> 0,-35,0 </pos>
 		<rot> 0,10,0 </rot>
-		<!-- <color>  aa00ff </color> -->
-				<color> ffffff </color>
-
+		<color>  aa00ff </color>
+		<!-- <color> ffffff </color> -->
 		<difuse>100</difuse>
 	</plane>
 
@@ -71,14 +70,16 @@
 	<sphere>
 		<pos> -30,30,70 </pos>
 		<radius> 10</radius>
-		<color> 0ddddd </color>
+		<color> 00ff00 </color>
+		<!-- <transparency_coef> 50 </transparency_coef> -->
 		<difuse>100</difuse>
 	</sphere>
 	<sphere>
 		<pos> 30,30,70 </pos>
 		<radius> 10</radius>
 		<color> 00ff00 </color>
-		<difuse>50</difuse>
+		<transparency_coef> 50 </transparency_coef>
+		<difuse>100</difuse>
 	</sphere>
 
 	<!-- sphere: 0,-20,50; 6; ff0000; -->
@@ -121,7 +122,7 @@
 		<rot> 0,0,0 </rot>
 	</cam>
 	<light>
-		<pos> 80,0,100 </pos>
+		<pos> 60,0,100 </pos>
 		<intensity> 100 </intensity>
 		<color> ffffff </color>
 	</light>

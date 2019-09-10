@@ -83,6 +83,7 @@ typedef struct		s_hit
 	cl_float3		hit_v;
 	cl_float3		hit_v_norm;
 	cl_float3		norm;
+	float			t;
 	global t_obj	*addr_obj;
 }					t_hit;
 
@@ -100,6 +101,9 @@ float				LOWER_AND_NOT_0(float a, float b);
 float3				vectofloat(cl_float3 vec);
 cl_float3			floattovec(float3 f3);
 float				equalizer(float value, float min, float max);
+t_fcolor			make_coef_fcolor(t_fcolor fcolor, float k);
+t_fcolor			add_fcolor(t_fcolor a, t_fcolor b);
+t_fcolor			norme_fcolor(t_fcolor fcolor);
 
 float				sphere_intersect(const t_ray ray, const t_obj sph);
 float				cylinder_intersect(const t_ray ray, const t_obj cylinder);
@@ -224,6 +228,32 @@ float	LOWER_AND_NOT_0(float a, float b)
 	if (b > a && b > 0)
 		return (b);
 	return (-1);
+}
+
+t_fcolor			make_coef_fcolor(t_fcolor fcolor, float k)
+{
+	fcolor.red *= k;
+	fcolor.green *= k;
+	fcolor.blue *= k;
+
+	return (fcolor);
+}
+
+t_fcolor			add_fcolor(t_fcolor a, t_fcolor b)
+{
+	a.red += b.red;
+	a.green += b.green;
+	a.blue += b.blue;
+	
+	return (a);
+}
+
+t_fcolor			norme_fcolor(t_fcolor fcolor)
+{
+	fcolor.red = equalizer(fcolor.red, 0.0, 1.0);
+	fcolor.green = equalizer(fcolor.green, 0.0, 1.0);
+	fcolor.blue = equalizer(fcolor.blue, 0.0, 1.0);
+	return (fcolor);
 }
 
 /*********************************************************************************/
@@ -368,7 +398,7 @@ void					set_norm(t_hit *hit)
 
 t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int obj_count, t_hit prev_hit)
 {
-	int	i;
+	int		i;
 	float	t;
 	float	tmp;
 	t_hit hit;
@@ -389,7 +419,8 @@ t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int 
 		return (hit);
 	hit.pos = (ray.dir * t) + ray.orig;
 	t += 1;
-	hit.hit_v = ray.dir * t;
+	hit.hit_v = hit.pos - ray.dir / 10;
+	hit.t = t;
 	hit.hit_v_norm = ray.dir;
 	set_norm(&hit);
 	return (hit);
@@ -399,8 +430,6 @@ float			spec(t_hit hit, t_ray light_ray, t_ray ray_arr)
 {
 	cl_float3	spec_ray;
 
-	// spec_ray = ((hit.norm * v_cos(hit.norm, light_ray.dir * -1)) - light_ray.dir * -1) + hit.norm;
-	// spec_ray = -light_ray.dir + hit.norm;
 	spec_ray = light_ray.dir - (2 * hit.norm * dot(light_ray.dir, hit.norm));
 	return (equalizer(pown(v_cos(spec_ray, fast_normalize(ray_arr.orig - hit.pos)), 20), 0., 1.));
 }
@@ -409,10 +438,8 @@ t_ray			get_reflect_ray(t_hit hit)
 {
 	t_ray	reflect_ray;
 
-	// reflect_ray.dir = normalize(hit.norm + (hit.hit_v * -1));
 	reflect_ray.dir = normalize(hit.hit_v_norm - (2 * hit.norm * dot(hit.hit_v_norm, hit.norm)));
-	reflect_ray.orig = hit.pos;
-	// reflect_ray.dir = normalize(((hit.norm * v_cos(hit.norm, hit.pos * -1)) - hit.pos * -1) + hit.norm);
+	reflect_ray.orig = hit.hit_v;
 	return (reflect_ray);
 }
 
@@ -424,7 +451,13 @@ float				objects_intersect_shadows(const t_ray ray, __global t_obj *objects, con
 	i = -1;
 	while (++i < obj_count)
 		if ((tmp = object_intersect(ray, objects[i])) > 0 && tmp < t)
+		{
 			t = tmp;
+			// if (objects[i].transparency_coef != 0.)
+			// {
+
+			// }
+		}
 	return (t);
 }
 
@@ -434,6 +467,7 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 	float			t;
 	float			buf;
 	float			sum[5];
+	t_hit			new_hit;
 	t_fcolor		res;
 	t_ray			light_ray;
 	cl_float3		rev_light_dir;
@@ -451,8 +485,10 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 		t = fast_length(light_ray.dir) - 0.1;
 		light_ray.dir = fast_normalize(light_ray.dir);
 
-		buf = fabs(t - objects_intersect_shadows(light_ray, obj, obj_count, t));
-		if (buf < 0.000001)
+		new_hit = objects_intersect(light_ray, obj, obj_count, hit);
+		buf = fabs(t - new_hit.t);
+		// buf = fabs(t - objects_intersect_shadows(light_ray, obj, obj_count, t));
+		if (t < new_hit.t || new_hit.obj.transparency_coef != 0.)
 		{
 			sum[3] = ambient / 100.;
 			rev_light_dir = light_ray.dir * -1;
@@ -470,6 +506,17 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 			sum[0] += light[i].fcolor.red * hit.obj.fcolor.red * sum[3];
 			sum[1] += light[i].fcolor.green * hit.obj.fcolor.green * sum[3];
 			sum[2] += light[i].fcolor.blue * hit.obj.fcolor.blue * sum[3];
+
+			if (t >= new_hit.t && new_hit.obj.transparency_coef != 0.)
+			{
+				sum[0] *= new_hit.obj.transparency_coef;
+				sum[1] *= new_hit.obj.transparency_coef;
+				sum[2] *= new_hit.obj.transparency_coef;
+
+				// sum[0] += new_hit.obj.fcolor.red * (1 - new_hit.obj.transparency_coef) / 10;
+				// sum[1] += new_hit.obj.fcolor.green * (1 - new_hit.obj.transparency_coef) / 10;
+				// sum[2] += new_hit.obj.fcolor.blue * (1 - new_hit.obj.transparency_coef) / 10;
+			}
 			// sum[0] += (((light[i].color.red / 255.0) * (hit.obj.color.red / 255.0))) * sum[3];
 			// sum[1] += (((light[i].color.green / 255.0) * (hit.obj.color.green / 255.0))) * sum[3];
 			// sum[2] += (((light[i].color.blue / 255.0) * (hit.obj.color.blue / 255.0))) * sum[3];
@@ -485,34 +532,10 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 	res.green = equalizer(sum[1], 0.0, 1.0);
 	res.blue = equalizer(sum[2], 0.0, 1.0);
 
+	// res = make_coef_fcolor(res, 1 - hit.obj.transparency_coef);
+
 	// final color
 	return (res);
-}
-
-t_fcolor			make_coef_fcolor(t_fcolor fcolor, float k)
-{
-	fcolor.red *= k;
-	fcolor.green *= k;
-	fcolor.blue *= k;
-
-	return (fcolor);
-}
-
-t_fcolor			add_fcolor(t_fcolor a, t_fcolor b)
-{
-	a.red += b.red;
-	a.green += b.green;
-	a.blue += b.blue;
-	
-	return (a);
-}
-
-t_fcolor			norme_fcolor(t_fcolor fcolor)
-{
-	fcolor.red = equalizer(fcolor.red, 0.0, 1.0);
-	fcolor.green = equalizer(fcolor.green, 0.0, 1.0);
-	fcolor.blue = equalizer(fcolor.blue, 0.0, 1.0);
-	return (fcolor);
 }
 
 t_fcolor			refcletions(t_fcolor prev_fcolor, __global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray)
@@ -520,7 +543,7 @@ t_fcolor			refcletions(t_fcolor prev_fcolor, __global t_obj *obj, const int obj_
 	t_fcolor	res_fcolor;
 	int			reflection_count;
 	float		reflection_intens;
-	int			max_reflections = 3;
+	int			max_reflections = 1;
 
 	if (hit.obj.reflection_coef == 0.)
 		return (prev_fcolor);

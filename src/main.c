@@ -97,7 +97,7 @@ void	ray_trace_ocl(t_scene *sc)
 	
 	
 	OCL[1].global = WIDTH * HEIGHT;
-	OCL[1].local = 1;
+	OCL[1].local = 250;
 	OCL[1].err = clEnqueueNDRangeKernel(OCL[1].commands, OCL[1].object_intersect_kernel,
 			       1, NULL, &OCL[1].global, &OCL[1].local,
 			       0, NULL, NULL);
