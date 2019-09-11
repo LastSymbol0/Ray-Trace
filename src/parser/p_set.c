@@ -18,6 +18,9 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 
 	child = obj->children;
 	sc->objects[i].type = type;
+	// sc->objects[i].transparency_coef = 0;
+	// sc->objects[i].reflection_coef = 0;
+	// sc->objects[i].difuse = 0.;
 	while (child)
 	{
 		if (child->type == XML_ELEMENT_NODE)

@@ -94,6 +94,9 @@ void	ray_trace_ocl(t_scene *sc)
 	OCL[1].err  = clSetKernelArg(OCL[1].object_intersect_kernel, 6, sizeof(float), &sc->ambient);
 	if (OCL[1].err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments2", 1);
+	OCL[1].err  = clSetKernelArg(OCL[1].object_intersect_kernel, 7, sizeof(float), &sc->max_reflections);
+	if (OCL[1].err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments2", 1);
 	
 	
 	OCL[1].global = WIDTH * HEIGHT;

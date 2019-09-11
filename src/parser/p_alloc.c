@@ -29,7 +29,7 @@ void	set_scene_atr(t_scene *sc, xmlNodePtr root)
 		else if (ft_strequ((char *)attr->name, "height"))
 			sc->height = ft_atoi((char *)attr->children->content);
 		else if (ft_strequ((char *)attr->name, "ambient"))
-			sc->ambient = ft_atoi((char *)attr->children->content);
+			sc->ambient = FROM_0_TO_1(ft_atoi((char *)attr->children->content) / 100.);
 		else if (ft_strequ((char *)attr->name, "max_reflections"))
 			sc->max_reflections = ft_atoi((char *)attr->children->content);
 		attr = attr->next;
