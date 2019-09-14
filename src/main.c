@@ -186,7 +186,6 @@ void	*mytime(void *thread)
 int		main(int ac, char **av)
 {
 	t_scene *sc;
-	int running = 1;
 
 	if (ac == 2)
 	{
@@ -206,30 +205,7 @@ int		main(int ac, char **av)
 		sc->thread.end = clock();
 
 		sdl_draw(sc);
-		while (running)
-			while(!SDL_PollEvent (&sc->sdl->event))
-				if (SDL_QUIT == sc->sdl->event.type || SDL_SCANCODE_ESCAPE == sc->sdl->event.key.keysym.scancode)
-					running = 0;
-				else if (SDL_SCANCODE_SPACE == sc->sdl->event.key.keysym.scancode)
-				{
-					sc->thread.start = clock();
-					printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
-					printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z );
-					sc->cam.pos.z += -1;
-
-					set_ray_arr_ocl_2(sc);
-					sc->thread.end = clock();
-					ray_trace_2(sc);
-					sc->thread.end = clock();
-					sdl_draw(sc);
-					sc->thread.end = clock();
-				}
-				else if(SDL_SCANCODE_S == sc->sdl->event.key.keysym.scancode)
-				{
-					// printf("dsds\n");
-					saveScreenshotBMP(sc);
-					sc->sdl->event.key.keysym.scancode = SDL_SCANCODE_F;
-				}
+		hook(sc);
 		sdl_destroy(sc);
 	}
 	else

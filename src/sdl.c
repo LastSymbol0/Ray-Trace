@@ -40,6 +40,7 @@ t_SDL	*sdl_init(t_scene *sc)
 	t_SDL	*sdl;
 
 	sdl = (t_SDL *)ft_memalloc(sizeof(t_SDL));
+	sdl->info= 0;
 	sdl->pixel = (Uint32 *)ft_memalloc(sizeof(Uint32) * HEIGHT * WIDTH);
 	if (SDL_Init(SDL_INIT_EVERYTHING))
 		ft_err("SDL init error", 1);

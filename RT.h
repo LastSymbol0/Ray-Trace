@@ -17,6 +17,7 @@
 # include "libxml2/libxml/parser.h"
 # include "libxml2/libxml/tree.h"
 # include <SDL2/SDL.h>
+# include "SDL_ttf.h"
 # include <OpenCL/opencl.h>
 # include <stdio.h>
 # include <unistd.h>
@@ -28,6 +29,8 @@
 
 # define WIDTH sc->width
 # define HEIGHT sc->height
+# define I_WIDTH 400
+# define I_HEIGHT 700
 # define RAY_ARR sc->ray_arr
 # define OCL sc->ocl
 # define CL_SUCCES 0
@@ -43,6 +46,7 @@
 # define BIGGER_THEN_0(a) (((a) > 0) ? (a) : 0)
 # define LOWER_THEN_1(a) (((a) < 1) ? (a) : 1)
 # define FROM_0_TO_1(a) BIGGER_THEN_0(LOWER_THEN_1((a)))
+# define LOWER_AND_NOT_0(a, b) ((a) < (b) && a > 0) ? (a) : ((b) < (a) && (b) > 0) ? (b) : -1
 
 
 enum			e_typeobject
@@ -53,6 +57,15 @@ enum			e_typeobject
 	SPHERE,
 	CYLINDER,
 };
+
+typedef struct		s_eq
+{
+	float			a;
+	float			b;
+	float			c;
+	float			d;
+}					t_eq;
+
 
 typedef struct	s_color
 {
@@ -105,6 +118,16 @@ typedef struct			s_SDL
 	SDL_Texture			*texture;
 	SDL_Event			event;
 	Uint32				*pixel;
+
+	int					info;
+	SDL_Window			*i_window;
+	SDL_Renderer		*i_render;
+	SDL_Surface			*i_surface;
+	SDL_Texture			*i_texture;
+	SDL_Event			i_event;
+	Uint32				*i_pixel;
+	int					i_offset_x;
+	int					i_offset_y;
 }						t_SDL;
 
 typedef struct			s_OpenCL
@@ -163,10 +186,21 @@ t_SDL		*sdl_init(t_scene *sc);
 void		sdl_draw(t_scene *sc);
 void		sdl_destroy(t_scene *sc);
 void		sdl_put_pixel(t_scene *sc, int x, int y, int color);
-void saveScreenshotBMP(t_scene *sc);
+void 		saveScreenshotBMP(t_scene *sc);
+
+void		hook(t_scene *sc);
+
+void	i_sdl_init(t_scene *sc);
+void	i_sdl_draw(t_scene *sc);
+void	i_sdl_destroy(t_scene *sc);
+void	i_sdl_put_pixel(t_scene *sc, int x, int y, int color);
+void	set_string(t_scene *sc, char *s, TTF_Font *font, SDL_Color color);
+void	set_background(t_scene *sc);
 
 t_OpenCL	*init_ocl(void);
 void		set_ray_arr_ocl(t_scene *sc);
+void		set_ray_arr_ocl_2(t_scene *sc);
+void		ray_trace_2(t_scene *sc);
 void		ray_arr_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);
 void		object_intersect_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);
 float		fequalizer(float value, float min, float max);
@@ -223,5 +257,14 @@ float			v_magn(cl_float3 v);
 cl_float3		v_scale(cl_float3 v, float n);
 cl_float3		v_add(cl_float3 v1, cl_float3 v2);
 float			v_angle(cl_float3 a, cl_float3 b);
+
+float				sphere_intersect(const t_ray ray, const t_obj sph);
+float				cylinder_intersect(const t_ray ray, const t_obj cylinder);
+float				cone_intersect(const t_ray ray, const t_obj cone);
+float				plane_intersect(const t_ray ray, const t_obj plane);
+t_obj	cast_ray(t_scene *sc, t_ray ray);
+t_ray	get_ray(t_scene *sc, int x, int y);
+
+
 
 #endif
