@@ -29,7 +29,7 @@
 
 # define WIDTH sc->width
 # define HEIGHT sc->height
-# define I_WIDTH 400
+# define I_WIDTH 600
 # define I_HEIGHT 700
 # define RAY_ARR sc->ray_arr
 # define OCL sc->ocl
@@ -189,6 +189,8 @@ void		sdl_put_pixel(t_scene *sc, int x, int y, int color);
 void 		saveScreenshotBMP(t_scene *sc);
 
 void		hook(t_scene *sc);
+void	render_sc_param(t_scene *sc);
+void	render_obj_param(t_scene *sc, t_obj obj);
 
 void	i_sdl_init(t_scene *sc);
 void	i_sdl_draw(t_scene *sc);
@@ -256,6 +258,7 @@ cl_float3		v_norm(cl_float3 v);
 float			v_magn(cl_float3 v);
 cl_float3		v_scale(cl_float3 v, float n);
 cl_float3		v_add(cl_float3 v1, cl_float3 v2);
+cl_float3		v_mult(cl_float3 a, cl_float3 b);
 float			v_angle(cl_float3 a, cl_float3 b);
 
 float				sphere_intersect(const t_ray ray, const t_obj sph);

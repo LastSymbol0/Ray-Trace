@@ -17,6 +17,12 @@ void	set_background(t_scene *sc)
 	SDL_Surface *background = SDL_LoadBMP( "Fract.bmp" );
 	SDL_BlitSurface(background, &((SDL_Rect){0, 0, I_WIDTH, I_HEIGHT}),
 					sc->sdl->i_surface, &((SDL_Rect){0, 0, I_WIDTH, I_HEIGHT}));
+	
+	TTF_Font* brush_script = TTF_OpenFont("/Library/Fonts/Brush Script.ttf", 36);
+	SDL_Color color = {255, 116, 0, 0};
+	sc->sdl->i_offset_x = 210;
+	sc->sdl->i_offset_y = 10;
+	set_string(sc, "Info window", brush_script, color);
 }
 
 void	set_string(t_scene *sc, char *s, TTF_Font *font, SDL_Color color)
@@ -83,11 +89,6 @@ void	i_sdl_init(t_scene *sc)
 
 
 	set_background(sc);
-	TTF_Font* brush_script = TTF_OpenFont("/Library/Fonts/Brush Script.ttf", 28);
-	SDL_Color color = {255, 116, 0, 0};
-	sc->sdl->i_offset_x = 10;
-	sc->sdl->i_offset_y = 10;
-	set_string(sc, "Info:", brush_script, color);
 	i_sdl_draw(sc);
 
 	// make_text(sc);

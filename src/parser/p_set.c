@@ -88,7 +88,7 @@ int		scene_set_cam(t_scene *sc, xmlNodePtr cur)
 					if (ft_strequ((char *)child->name, "pos"))
 						sc->cam.pos = parse_vec((char *)xmlNodeGetContent(child));
 					else if (ft_strequ((char *)child->name, "rot"))
-						sc->cam.rot = parse_vec((char *)xmlNodeGetContent(child));
+						sc->cam.rot = v_norm(parse_vec((char *)xmlNodeGetContent(child)));
 				}
 				child = child->next;
 			}

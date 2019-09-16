@@ -207,6 +207,9 @@ int		main(int ac, char **av)
 		sdl_draw(sc);
 		hook(sc);
 		sdl_destroy(sc);
+		if (sc->sdl->info == 1)
+			i_sdl_destroy(sc);
+
 	}
 	else
 		write(1, "1 argument plz\n", 15);

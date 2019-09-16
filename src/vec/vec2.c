@@ -14,7 +14,7 @@
 
 cl_float3	v_norm(cl_float3 v)
 {
-	return (v_scale(v, 1.0 / v_magn(v)));
+	return (v_scale(v, 1.0 / (v_magn(v) > 0 ? v_magn(v) : 0.0001)));
 }
 
 float	v_magn(cl_float3 v)
@@ -28,6 +28,14 @@ cl_float3	v_scale(cl_float3 v, float n)
 	v.y *= n;
 	v.z *= n;
 	return (v);
+}
+
+cl_float3	v_mult(cl_float3 a, cl_float3 b)
+{
+	a.x *= b.x;
+	a.y *= b.y;
+	a.z *= b.z;
+	return (a);
 }
 
 cl_float3	v_add(cl_float3 v1, cl_float3 v2)
