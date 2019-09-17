@@ -18,6 +18,7 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 
 	child = obj->children;
 	sc->objects[i].type = type;
+	sc->objects[i].refract_coef = 1.0;
 	// sc->objects[i].transparency_coef = 0;
 	// sc->objects[i].reflection_coef = 0;
 	// sc->objects[i].difuse = 0.;
@@ -39,6 +40,8 @@ void	set_object(t_scene *sc, xmlNodePtr obj, int i, short type)
 				sc->objects[i].reflection_coef = FROM_0_TO_1(ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
 			else if (ft_strequ((char *)child->name, "transparency_coef"))
 				sc->objects[i].transparency_coef = FROM_0_TO_1(ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
+			else if (ft_strequ((char *)child->name, "refract_coef"))
+				sc->objects[i].refract_coef = ft_atoi((char *)xmlNodeGetContent(child)) / 10.;
 			else
 				ft_err(ft_strjoin("Undefined object argument: ", (char *)child->name), 1);
 		}
@@ -88,7 +91,7 @@ int		scene_set_cam(t_scene *sc, xmlNodePtr cur)
 					if (ft_strequ((char *)child->name, "pos"))
 						sc->cam.pos = parse_vec((char *)xmlNodeGetContent(child));
 					else if (ft_strequ((char *)child->name, "rot"))
-						sc->cam.rot = v_norm(parse_vec((char *)xmlNodeGetContent(child)));
+						sc->cam.rot = parse_vec((char *)xmlNodeGetContent(child));
 				}
 				child = child->next;
 			}

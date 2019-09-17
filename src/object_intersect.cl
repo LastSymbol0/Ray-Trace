@@ -58,6 +58,7 @@ typedef struct		s_obj
 	float			difuse;
 	float			reflection_coef;
 	float			transparency_coef;
+	float			refract_coef;
 
 
 	float			t;
@@ -452,6 +453,23 @@ t_ray			get_reflect_ray(t_hit hit)
 	return (reflect_ray);
 }
 
+float3			get_refract_ray(float3 ray_dir, float3 a_normal, float a_matIOR) 
+{
+	float eta = 1.0f/a_matIOR; // eta = in_IOR/out_IOR
+	float cos_theta = -dot(a_normal, ray_dir);
+	if(cos_theta < 0)
+	{
+	  cos_theta *= -1.0f;
+	  a_normal *= -1.0f;
+	  eta = 1.0f/eta;
+	}
+	float k = 1.0f - eta*eta*(1.0-cos_theta*cos_theta);
+	if(k >= 0.0f)
+	  ray_dir = normalize( eta*ray_dir + (eta*cos_theta - sqrt(k))*a_normal);
+	return (ray_dir);
+
+}
+
 t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *light, const int light_count, t_hit hit, const float ambient, t_ray ray)
 {
 	int				i;
@@ -542,6 +560,7 @@ t_fcolor			transparency(t_fcolor prev_fcolor, __global t_obj *obj, const int obj
 	{
 		transparency_coef = hit.obj.transparency_coef;
 		ray.orig = hit.pos;
+		ray.dir = get_refract_ray(ray.dir, hit.norm, hit.obj.refract_coef);
 		hit = objects_intersect(ray, obj, obj_count, hit, LIMIT);
 		res_fcolor = add_fcolor(res_fcolor, make_coef_fcolor(shadows(obj, obj_count, light, light_count, hit, ambient, ray), transparency_coef));
 	}

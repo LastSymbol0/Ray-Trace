@@ -144,6 +144,14 @@ void	ray_trace_2(t_scene *sc)
 
 }
 
+void	set_ray_arr_ocl_3(t_scene *sc)
+{
+	OCL->err  = clSetKernelArg(OCL->ray_arr_kernel, 3, sizeof(cl_float3), &sc->cam.rot);
+	if (OCL->err != CL_SUCCESS)
+		ft_err("Failed to set kernel arguments", 1);
+	set_ray_arr_ocl_2(sc);
+}
+
 void	set_ray_arr_ocl_2(t_scene *sc)
 {
 	

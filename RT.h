@@ -106,6 +106,7 @@ typedef struct	s_obj
 	float		difuse;
 	float		reflection_coef;
 	float		transparency_coef;
+	float		refract_coef;
 
 	float		t;
 }				t_obj;
@@ -202,6 +203,7 @@ void	set_background(t_scene *sc);
 t_OpenCL	*init_ocl(void);
 void		set_ray_arr_ocl(t_scene *sc);
 void		set_ray_arr_ocl_2(t_scene *sc);
+void		set_ray_arr_ocl_3(t_scene *sc);
 void		ray_trace_2(t_scene *sc);
 void		ray_arr_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);
 void		object_intersect_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName);

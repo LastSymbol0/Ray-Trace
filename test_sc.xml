@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<scene name="test_sc" width="2000" height="1000" ambient="0" max_reflections="1">
+<scene name="test_sc" width="1200" height="700" ambient="0" max_reflections="0">
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 1,1,1 </rot> 
@@ -96,6 +96,14 @@
 		<difuse>100</difuse>
 	</sphere>
 
+	<sphere>
+		<pos> 25,0,130 </pos>
+		<radius> 25</radius>
+		<color> ffffff </color>
+		<transparency_coef> 60 </transparency_coef>
+		<refract_coef> 20 </refract_coef>
+		<difuse>100</difuse>
+	</sphere>
 	<!-- sphere: 0,-20,50; 6; ff0000; -->
 
 	<cylinder>
@@ -134,7 +142,7 @@
 		<rot> -1,0,-1 </rot>
 	</cam> -->
 	<cam>
-		<pos> 0,0,200 </pos>
+		<pos> 0,0,300 </pos>
 		<rot> 0,0,0 </rot>
 	</cam>
 	<light>

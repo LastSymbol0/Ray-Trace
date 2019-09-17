@@ -92,16 +92,43 @@ void	mouse_click(t_scene *sc)
 	SDL_RaiseWindow(sc->sdl->i_window);
 }
 
+void	mouse_move(t_scene *sc)
+{
+	// sc->thread.start = clock();
+	// printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
+	// printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z);
+	sc->cam.rot.x += sc->sdl->event.motion.xrel / 10;
+	sc->cam.rot.y += sc->sdl->event.motion.yrel / 10;
+	if (sc->cam.rot.x > 360)
+		sc->cam.rot.x = sc->cam.rot.x - 360;
+	if (sc->cam.rot.y > 360)
+		sc->cam.rot.y = sc->cam.rot.y - 360;
+	if (sc->cam.rot.x < 0)
+		sc->cam.rot.x = 360 - sc->cam.rot.x;
+	if (sc->cam.rot.y < 0)
+		sc->cam.rot.y = 360 - sc->cam.rot.y;
+	set_ray_arr_ocl_3(sc);
+	// sc->thread.end = clock();
+	ray_trace_2(sc);
+	// sc->thread.end = clock();
+	sdl_draw(sc);
+				// sc->thread.end = clock();
+
+
+}
+
 void	hook(t_scene *sc)
 {
 	int running = 1;
 
 	while (running)
 	{
-		while (!SDL_PollEvent(&sc->sdl->event))
+		while (SDL_PollEvent(&sc->sdl->event))
 		{
 			if (SDL_QUIT == sc->sdl->event.type || SDL_SCANCODE_ESCAPE == sc->sdl->event.key.keysym.scancode)
 				running = 0;
+			else if (sc->sdl->event.type ==  SDL_MOUSEMOTION)
+				mouse_move(sc);
 			else if (SDL_SCANCODE_SPACE == sc->sdl->event.key.keysym.scancode)
 			{
 				sc->thread.start = clock();
@@ -116,7 +143,7 @@ void	hook(t_scene *sc)
 				sdl_draw(sc);
 				sc->thread.end = clock();
 			}
-			else if(SDL_SCANCODE_S == sc->sdl->event.key.keysym.scancode)
+			else if(SDL_SCANCODE_P == sc->sdl->event.key.keysym.scancode)
 			{
 				saveScreenshotBMP(sc);
 				sc->sdl->event.key.keysym.scancode = SDL_SCANCODE_F;
@@ -151,6 +178,21 @@ void	hook(t_scene *sc)
 				printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z);
 				t_ray dir = get_ray(sc, WIDTH / 2, HEIGHT / 2);
 				sc->cam.pos = v_add(sc->cam.pos, dir.dir);
+
+				set_ray_arr_ocl_2(sc);
+				sc->thread.end = clock();
+				ray_trace_2(sc);
+				sc->thread.end = clock();
+				sdl_draw(sc);
+				sc->thread.end = clock();
+			}
+			else if (SDL_SCANCODE_S == sc->sdl->event.key.keysym.scancode)
+			{
+				sc->thread.start = clock();
+				printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
+				printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z);
+				t_ray dir = get_ray(sc, WIDTH / 2, HEIGHT / 2);
+				sc->cam.pos = v_add(sc->cam.pos, v_scale(dir.dir, -1));
 
 				set_ray_arr_ocl_2(sc);
 				sc->thread.end = clock();
