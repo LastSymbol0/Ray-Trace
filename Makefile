@@ -13,6 +13,8 @@ SDL= -I ~/Library/Frameworks/SDL2.framework/Versions/A/Headers -F ~/Library/Fram
 
 OpenCL= -framework OpenCL
 
+OpenGL= -framework GLUT -framework OpenGL 
+
 LIB_XML= -I /usr/include/libxml2/ -lxml2 
 
 OBJ=$(SRC:%.c=%.o)
@@ -25,7 +27,7 @@ all: $(NAME)
 
 $(NAME): 
 	@make -C ./libft/
-	@gcc -g -o $(NAME) $(SRC) $(FLAGS) $(INCL) $(LIB_XML) $(SDL) $(OpenCL)
+	@gcc -g -o $(NAME) $(SRC) $(INCL) $(LIB_XML) $(SDL) $(OpenCL) $(OpenGL)
 	@echo "\x1b[32m Success build"
 
 clean:

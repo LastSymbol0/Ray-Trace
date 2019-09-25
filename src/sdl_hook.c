@@ -12,195 +12,30 @@
 
 #include "RT.h"
 
-char	*get_string_obj_type(int type)
-{
-	if (type == SPHERE)
-		return ("sphere");
-	if (type == PLANE)
-		return ("plane");
-	if (type == CYLINDER)
-		return ("cylinder");
-	if (type == CONE)
-		return ("cone");
-	return ("null");
-}
-
-void	render_sc_param(t_scene *sc)
-{
-	TTF_Font* arial = TTF_OpenFont("/Library/Fonts/Arial.ttf", 20);
-	SDL_Color color = {255, 116, 0, 0};
-	
-	sc->sdl->i_offset_x = 20;
-	sc->sdl->i_offset_y = 50;
-	// set_string(sc, "Type: 2", arial, color);
-	// // sc->sdl->i_offset_x += 30;
-	// sc->sdl->i_offset_y += 30;
-	// set_string(sc, "Pos:\n\t x = 20; y = 30; z = 40", arial, color);
-
-	char s[500];
-	sprintf(s, "Scene:\n\n  Camera:\n    Position:\n      x: %.4f,\n      y: %.4f,\n      z: %.4f;\n    Rotation:\n      x: %.4f,\n      y: %.4f,\n      z: %.4f;\n\n  Objects count:  %d\n  Lights count:  %d\n  Max reflections:  %d\n",
-			sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z,
-			sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z,
-			sc->obj_count,
-			sc->light_count,
-			sc->max_reflections);
-	set_string(sc, s, arial, color);
-	i_sdl_draw(sc);
-
-}
-
-void	render_obj_param(t_scene *sc, t_obj obj)
-{
-	TTF_Font* arial = TTF_OpenFont("/Library/Fonts/Arial.ttf", 20);
-	SDL_Color color = {255, 116, 0, 0};
-	
-	sc->sdl->i_offset_x = 300;
-	sc->sdl->i_offset_y = 50;
-
-	char s[500];
-	sprintf(s, "Object:\n\n  Type: %s;\n  Radius: %d;\n  Position:\n    x: %.4f,\n    y: %.4f,\n    z: %.4f;\n  Rotation:\n    x: %.4f,\n    y: %.4f,\n    z: %.4f;\n  Color:\n    r: %d,\n    g: %d,\n    b: %d;\n  Difuse:  %.2f\n  Reflection:  %.2f\n  Transparency:  %.2f\n",
-			get_string_obj_type(obj.type),
-			obj.radius,
-			obj.pos.x, obj.pos.y, obj.pos.z,
-			obj.rot.x, obj.rot.y, obj.rot.z,
-			obj.color.red, obj.color.green, obj.color.blue,
-			obj.difuse,
-			obj.reflection_coef,
-			obj.transparency_coef);
-	set_string(sc, s, arial, color);
-	i_sdl_draw(sc);
-
-}
-
-
-void	mouse_click(t_scene *sc)
-{
-	int mouseX, mouseY;
-
-	SDL_GetMouseState(&mouseX, &mouseY);
-	printf("Click! x: %d, y: %d\n", mouseX, mouseY);
-	t_obj obj;
-	obj = cast_ray(sc, get_ray(sc, mouseX, mouseY));
-	SDL_FreeSurface(sc->sdl->i_surface);
-	set_background(sc);
-	render_sc_param(sc);
-	// TTF_Font* brush_script = TTF_OpenFont("/Library/Fonts/Brush Script.ttf", 28);
-	// SDL_Color color = {255, 116, 0, 0};
-	// sc->sdl->i_offset_x = 10;
-	// sc->sdl->i_offset_y = 10;
-	render_obj_param(sc, obj);
-	SDL_RaiseWindow(sc->sdl->i_window);
-}
-
-void	mouse_move(t_scene *sc)
-{
-	// sc->thread.start = clock();
-	// printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
-	// printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z);
-	sc->cam.rot.x += sc->sdl->event.motion.xrel / 10;
-	sc->cam.rot.y += sc->sdl->event.motion.yrel / 10;
-	if (sc->cam.rot.x > 360)
-		sc->cam.rot.x = sc->cam.rot.x - 360;
-	if (sc->cam.rot.y > 360)
-		sc->cam.rot.y = sc->cam.rot.y - 360;
-	if (sc->cam.rot.x < 0)
-		sc->cam.rot.x = 360 - sc->cam.rot.x;
-	if (sc->cam.rot.y < 0)
-		sc->cam.rot.y = 360 - sc->cam.rot.y;
-	set_ray_arr_ocl_3(sc);
-	// sc->thread.end = clock();
-	ray_trace_2(sc);
-	// sc->thread.end = clock();
-	sdl_draw(sc);
-				// sc->thread.end = clock();
-
-
-}
 
 void	hook(t_scene *sc)
 {
 	int running = 1;
+	SDL_Window *win;
+	SDL_GLContext glContext;
+	struct nk_color background;
+	struct nk_context *ctx;
+	struct nk_colorf bg;
 
+	sc->mouse_move_enable = 0;
+	win = SDL_CreateWindow("Info", 200, 200, I_OBJ_WIDTH, I_OBJ_HEIGHT, SDL_WINDOW_OPENGL|SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);
+	glContext = SDL_GL_CreateContext(win);
+	ctx = nk_sdl_init(win);
+	strange_fonts_magic(ctx);
+	bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
 	while (running)
 	{
-		while (SDL_PollEvent(&sc->sdl->event))
-		{
-			if (SDL_QUIT == sc->sdl->event.type || SDL_SCANCODE_ESCAPE == sc->sdl->event.key.keysym.scancode)
-				running = 0;
-			else if (sc->sdl->event.type ==  SDL_MOUSEMOTION)
-				mouse_move(sc);
-			else if (SDL_SCANCODE_SPACE == sc->sdl->event.key.keysym.scancode)
-			{
-				sc->thread.start = clock();
-				printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
-				printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z);
-				sc->cam.pos.z += -1;
+		main_evt(ctx, win, glContext, sc);
 
-				set_ray_arr_ocl_2(sc);
-				sc->thread.end = clock();
-				ray_trace_2(sc);
-				sc->thread.end = clock();
-				sdl_draw(sc);
-				sc->thread.end = clock();
-			}
-			else if(SDL_SCANCODE_P == sc->sdl->event.key.keysym.scancode)
-			{
-				saveScreenshotBMP(sc);
-				sc->sdl->event.key.keysym.scancode = SDL_SCANCODE_F;
-			}
-			else if(SDL_SCANCODE_I == sc->sdl->event.key.keysym.scancode)
-			{
-				if (sc->sdl->info == 0)
-				{
-					sc->sdl->info = 1;
-					i_sdl_init(sc);
-					render_sc_param(sc);
-					render_obj_param(sc, sc->objects[1]);
-					// i_sdl_draw(sc);
-				}
-				else
-				{
-					sc->sdl->info = 0;
-					i_sdl_destroy(sc);
-				}
-				// sc->sdl->event.key.keysym.scancode = SDL_SCANCODE_F;
-			}
-			else if (sc->sdl->info == 1 && sc->sdl->event.type == SDL_MOUSEBUTTONDOWN)
-			{
-				mouse_click(sc);
-				// sc->sdl->event.type = 0;
-				// mousePress(sc->sdl->event.button);
-			}
-			else if (SDL_SCANCODE_W == sc->sdl->event.key.keysym.scancode)
-			{
-				sc->thread.start = clock();
-				printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
-				printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z);
-				t_ray dir = get_ray(sc, WIDTH / 2, HEIGHT / 2);
-				sc->cam.pos = v_add(sc->cam.pos, dir.dir);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(bg.r, bg.g, bg.b, bg.a);
 
-				set_ray_arr_ocl_2(sc);
-				sc->thread.end = clock();
-				ray_trace_2(sc);
-				sc->thread.end = clock();
-				sdl_draw(sc);
-				sc->thread.end = clock();
-			}
-			else if (SDL_SCANCODE_S == sc->sdl->event.key.keysym.scancode)
-			{
-				sc->thread.start = clock();
-				printf("cam rot %f %f %f\n", sc->cam.rot.x, sc->cam.rot.y, sc->cam.rot.z);
-				printf("cam pos %f %f %f\n",sc->cam.pos.x, sc->cam.pos.y, sc->cam.pos.z);
-				t_ray dir = get_ray(sc, WIDTH / 2, HEIGHT / 2);
-				sc->cam.pos = v_add(sc->cam.pos, v_scale(dir.dir, -1));
-
-				set_ray_arr_ocl_2(sc);
-				sc->thread.end = clock();
-				ray_trace_2(sc);
-				sc->thread.end = clock();
-				sdl_draw(sc);
-				sc->thread.end = clock();
-			}
-		}
+		nk_sdl_render(NK_ANTI_ALIASING_ON);
+		SDL_GL_SwapWindow(win);
 	}
 }

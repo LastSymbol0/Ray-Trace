@@ -12,24 +12,6 @@
 
 #include "RT.h"
 
-float	fequalizer(float value, float min, float max)
-{
-	if (value < min)
-		value = min;
-	if (value > max)
-		value = max;
-	return (value);
-}
-
-int		equalizer(int value, int min, int max)
-{
-	if (value < min)
-		value = min;
-	if (value > max)
-		value = max;
-	return (value);
-}
-
 int			ft_atoi_base(char *str, int base)
 {
 	int i;

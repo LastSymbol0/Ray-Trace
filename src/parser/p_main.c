@@ -12,6 +12,17 @@
 
 #include "RT.h"
 
+void	scene_set_obj_types(t_scene *sc)
+{
+	sc->obj_types = (const char **)ft_memalloc(sizeof(char *) * 6);
+	sc->obj_types[0] = "NONE";
+	sc->obj_types[1] = "CONE";
+	sc->obj_types[2] = "PLANE";
+	sc->obj_types[3] = "SPHERE";
+	sc->obj_types[4] = "CYLINDER";
+	sc->obj_types[5] = NULL;
+}
+
 t_scene	*parser(char *filename)
 {
 	t_scene		*sc;
@@ -27,6 +38,7 @@ t_scene	*parser(char *filename)
 		ft_err("Something wrong with camera count", 1);
 	scene_set_objects(sc, root);
 	scene_set_lights(sc, root->children);
+	scene_set_obj_types(sc);
 	// printf("Root node found!\nName: %s\nAttr0: %s=%s\n\n", root->name, root->properties->name, root->properties->children->content);
 	recurs(root, 0);
 	return(sc);

@@ -7,7 +7,15 @@
 		"iterator": "c",
 		"string": "c",
 		"string_view": "c",
-		"typeinfo": "c"
+		"typeinfo": "c",
+		"nuklear.h": "c",
+		"__functional_base": "c",
+		"memory": "c",
+		"tuple": "c",
+		"utility": "c",
+		"rt.h": "c",
+		"stdlib.h": "c",
+		"nuklear_sdl_gl2.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled"
 }

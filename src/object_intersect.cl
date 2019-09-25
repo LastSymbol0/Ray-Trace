@@ -309,7 +309,7 @@ float				sphere_intersect(const t_ray ray, const t_obj sph)
 			di1 = fast_length(pc - ray.orig) - dist;
 		else
 			di1 = fast_length(pc - ray.orig) + dist;
-			return (di1);
+		return (di1);
 	}
 }
 

@@ -12,35 +12,11 @@
 
 #include "RT.h"
 
-// void	test_sdl(t_scene *sc)
-// {
-// 	int	x;
-// 	int	y;
-// 	int running;
-
-// 	running = 1;
-// 	y = -1;
-// 	while(++y < HEIGHT)
-// 	{
-// 		x = -1;
-// 		while(++x < WIDTH)
-// 			sdl_put_pixel(sc, x, y, 1233454);
-// 	}
-// 	sdl_draw(sc);
-	
-// 	while (running)
-// 		while(!SDL_PollEvent (&sc->sdl->event))
-// 			if (SDL_QUIT == sc->sdl->event.type || SDL_SCANCODE_ESCAPE == sc->sdl->event.key.keysym.scancode)
-// 				running = 0;
-// 	sdl_destroy(sc);
-// }
-
 t_SDL	*sdl_init(t_scene *sc)
 {
 	t_SDL	*sdl;
 
 	sdl = (t_SDL *)ft_memalloc(sizeof(t_SDL));
-	sdl->info= 0;
 	sdl->pixel = (Uint32 *)ft_memalloc(sizeof(Uint32) * HEIGHT * WIDTH);
 	if (SDL_Init(SDL_INIT_EVERYTHING))
 		ft_err("SDL init error", 1);

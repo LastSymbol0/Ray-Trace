@@ -64,7 +64,7 @@ t_ray	get_ray(t_scene *sc, int x, int y)
 	return (ray);
 }
 
-float				object_intersect(const t_ray ray, const t_obj object)
+float	object_intersect(const t_ray ray, const t_obj object)
 {
 	if (object.type == SPHERE)
 		return(sphere_intersect(ray, object));
@@ -77,20 +77,21 @@ float				object_intersect(const t_ray ray, const t_obj object)
 	return(0);
 }
 
-t_obj	cast_ray(t_scene *sc, t_ray ray)
+t_obj	*cast_ray(t_scene *sc, t_ray ray)
 {
 	int		i;
 	float	t = 2147483647;
-	t_obj	obj;
+	t_obj	*obj;
 	float	tmp;
 
+	obj = NULL;
 	i = -1;
 	while (++i < sc->obj_count)
 	{
 		if ((tmp = object_intersect(ray, sc->objects[i])) > 0 && tmp < t)
 		{
 			t = tmp;
-			obj = sc->objects[i];
+			obj = &sc->objects[i];
 		}
 	}
 	return (obj);
