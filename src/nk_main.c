@@ -16,10 +16,13 @@ void	main_evt(struct nk_context *ctx, SDL_Window *win, SDL_GLContext glContext, 
 {
 	static t_obj	*obj;
 	t_obj			tmp;
-	t_obj			*empty;
+	// t_obj			*empty;
 	SDL_Event		evt;
 
-	empty = (t_obj *)ft_memalloc(sizeof(obj));
+	// obj = NULL;
+	// empty = (t_obj *)ft_memalloc(sizeof(obj));
+	// empty->type = CAM;
+	// empty->rot = v_norm(empty->rot);
 	nk_input_begin(ctx);
 	while (SDL_PollEvent(&evt))
 	{
@@ -45,10 +48,10 @@ void	main_evt(struct nk_context *ctx, SDL_Window *win, SDL_GLContext glContext, 
 	}
 	nk_input_end(ctx);
 	if (obj == NULL)
-		obj = empty;
+		obj = &sc->objects[2];
 	tmp = *obj;
 	scene_win(ctx, sc);
 	obj_win(ctx, obj, sc);
-	if (obj && !obj_equal(tmp, *obj))
+	if (!obj_equal(tmp, *obj))
 		redraw_obj(sc);
 }
