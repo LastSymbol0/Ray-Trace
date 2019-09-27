@@ -77,8 +77,12 @@ void	set_ray_arr_ocl(t_scene *sc)
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to set kernel arguments", 1);
 
-	OCL->global = HEIGHT * WIDTH;
-	OCL->local = 1;
+	OCL->global = WIDTH * HEIGHT;
+	OCL->err = clGetKernelWorkGroupInfo(OCL->ray_arr_kernel, OCL->device_id,
+				 CL_KERNEL_WORK_GROUP_SIZE,
+				 sizeof(OCL->local), &OCL->local, NULL);
+	while (OCL->global % OCL->local != 0)
+		OCL->local--;
 
 	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->ray_arr_kernel,
 			       1, NULL, &OCL->global, &OCL->local,
@@ -110,8 +114,7 @@ void	set_ray_arr_ocl_2(t_scene *sc)
 	if (OCL->err != CL_SUCCESS)
 		ft_err("Failed to write to source array (ray_arr)", 1);
 
-	OCL->global = HEIGHT * WIDTH;
-	OCL->local = 1;
+
 
 	OCL->err = clEnqueueNDRangeKernel(OCL->commands, OCL->ray_arr_kernel,
 			       1, NULL, &OCL->global, &OCL->local,

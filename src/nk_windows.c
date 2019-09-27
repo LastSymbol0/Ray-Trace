@@ -24,7 +24,7 @@ void	scene_win(struct nk_context *ctx, t_scene *sc)
 	prev_ambient = sc->ambient;
 	prev_max_ref = sc->max_reflections;
 	if (nk_begin(ctx, "Scene", nk_rect(10, 360, 420, 340),
-		NK_WINDOW_BORDER|NK_WINDOW_CLOSABLE|NK_WINDOW_SCALABLE)) {
+		NK_WINDOW_BORDER|NK_WINDOW_SCALABLE)) {
 
 		nk_layout_row_dynamic(ctx, 30, 2);
 		nk_label(ctx, "Cam:", NK_TEXT_CENTERED);
@@ -68,7 +68,7 @@ void	scene_win(struct nk_context *ctx, t_scene *sc)
 void	obj_win(struct nk_context *ctx, t_obj *obj, t_scene *sc)
 {
 	if (nk_begin(ctx, "Object", nk_rect(10, 10, 420, 340),
-		NK_WINDOW_BORDER|NK_WINDOW_CLOSABLE|NK_WINDOW_SCALABLE)) {
+		NK_WINDOW_BORDER|NK_WINDOW_SCALABLE)) {
 
 		nk_layout_row_dynamic(ctx, 20, 2);
 		nk_label(ctx, "Object type:", NK_TEXT_LEFT);
