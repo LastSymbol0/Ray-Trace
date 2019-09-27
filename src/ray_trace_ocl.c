@@ -103,7 +103,7 @@ void	ray_trace_ocl(t_scene *sc)
 	OCL[1].err = clGetKernelWorkGroupInfo(OCL[1].object_intersect_kernel, OCL[1].device_id,
 				 CL_KERNEL_WORK_GROUP_SIZE,
 				 sizeof(OCL[1].local), &OCL[1].local, NULL);
-	while (WIDTH * HEIGHT % OCL[1].local != 0)
+	while (OCL[1].global % OCL[1].local != 0)
 		OCL[1].local--;
 	// OCL[1].local = 250;
 	OCL[1].err = clEnqueueNDRangeKernel(OCL[1].commands, OCL[1].object_intersect_kernel,
