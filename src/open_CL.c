@@ -22,7 +22,7 @@ t_OpenCL	*init_ocl(void)
 		ft_err("Failed to find a platform", 1);
 
 	// Get a device of the appropriate type
-	ocl->err = clGetDeviceIDs(ocl->Platform, CL_DEVICE_TYPE_GPU, 1, &ocl->device_id, NULL);
+	ocl->err = clGetDeviceIDs(ocl->Platform, USED_CL_DEVICE, 1, &ocl->device_id, NULL);
 	if (ocl->err != CL_SUCCESS)
 		ft_err("Failed to create a device group", 1);
 
@@ -40,7 +40,7 @@ t_OpenCL	*init_ocl(void)
 		ft_err("Failed to find a platform", 1);
 
 	// Get a device of the appropriate type
-	ocl->err = clGetDeviceIDs(ocl->Platform, CL_DEVICE_TYPE_GPU, 1, &ocl->device_id, NULL);
+	ocl->err = clGetDeviceIDs(ocl->Platform, USED_CL_DEVICE, 1, &ocl->device_id, NULL);
 	if (ocl->err != CL_SUCCESS)
 		ft_err("Failed to create a device group", 1);
 

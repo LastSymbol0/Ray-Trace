@@ -61,6 +61,7 @@
 # define LIGHT_BUFF OCL[1].output[3]
 # define AMBIENT_BUFF OCL[1].output[4]
 
+# define USED_CL_DEVICE CL_DEVICE_TYPE_CPU
 # define MAX_OBJ_COUNT 50
 
 # define LOWER_THEN_1(a) (((a) < 1) ? (a) : 1)

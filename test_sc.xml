@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<scene name="test_sc" width="1500" height="700" ambient="0" max_reflections="2">
+<scene name="test_sc" width="1000" height="500" ambient="0" max_reflections="2">
 	<plane>
 		<pos> 0,0,-10 </pos>
 		<rot> 1,1,1 </rot> 
 		<color> 0000aa </color>
 		<!-- <color> ffffff </color> -->
 		<reflection_coef>20</reflection_coef>
-		<transparency_coef>20</transparency_coef>
+		<transparency_coef>100</transparency_coef>
 		<difuse>100</difuse>
 	</plane>
 	<plane>

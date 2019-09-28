@@ -430,7 +430,6 @@ t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int 
 	t_hit hit;
 
 	hit.obj.type = NONE;
-	hit.obj.transparency_coef = 0.000000;
 	i = -1;
 	while (++i < obj_count)
 	{
@@ -492,8 +491,6 @@ t_fcolor			local_color(t_ray light_ray, t_light light, t_hit hit, const float am
 
 	k = ambient;
 	// difuse coef
-			// printf(" %f %f %f \n", hit.obj.fcolor.red, hit.obj.fcolor.green, hit.obj.fcolor.blue);
-			// printf(" %f %f %f \n", light.fcolor.red, light.fcolor.green, light.fcolor.blue);
 	k += equalizer((light.intensity / 100) * hit.obj.difuse * pown(dot(light_ray.dir, hit.norm) / (fast_length(light_ray.dir) * fast_length(hit.norm)), 1), 0.0, 100.);
 	// specularity coef
 	k += spec(hit, light_ray, ray);
@@ -511,7 +508,6 @@ t_fcolor			transparency_shadows(t_fcolor color, t_ray light_ray, t_light light, 
 	i = 0;
 	do
 	{
-		// printf("%f\n", hit.obj.transparency_coef);
 		color = make_coef_fcolor(color, hit->obj.transparency_coef);
 
 		k = ambient;
@@ -531,10 +527,8 @@ t_fcolor			transparency_shadows(t_fcolor color, t_ray light_ray, t_light light, 
 		t = fast_length(light_ray.dir) - 0.1;
 		light_ray.dir = fast_normalize(light_ray.dir);
 
-		// hit.addr_obj = 0;
 		*hit = objects_intersect(light_ray, obj, obj_count, *hit, t);
 	}	while (hit->obj.type != NONE && hit->obj.transparency_coef > 0.01 && ++i < 6 && prev_hit.addr_obj != hit->addr_obj);
-	
 	if (hit->obj.type != NONE && hit->obj.transparency_coef < 0.01)
 	{
 		color.red = 0;
@@ -555,7 +549,6 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 	t_ray			light_ray;
 
 
-			// printf(" %f %f %f ", hit.obj.fcolor.red, hit.obj.fcolor.green, hit.obj.fcolor.blue);
 	k = ambient;
 	i = -1;
 	res.red = 0.;
@@ -575,24 +568,12 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 		new_hit.addr_obj = 0;
 		new_hit = objects_intersect(light_ray, obj, obj_count, new_hit, t);
 		if (new_hit.obj.type == NONE || (new_hit.obj.type != NONE && new_hit.obj.transparency_coef > 0.01))
-		{
 			tmp = local_color(light_ray, light[i], hit, ambient, ray, t);
-		}
 		if (new_hit.obj.type != NONE && new_hit.obj.transparency_coef > 0.001)
-		{
-			// printf("%f\n", new_hit.obj.transparency_coef);
 			tmp = transparency_shadows(tmp, light_ray, light[i], &new_hit, ambient, ray, t, obj, obj_count, hit);
-		}
 		res = add_fcolor(res, tmp);
 	}
-
-	// res[light_count].red < ((hit.obj.fcolor.red) * ambient) ? res[light_count].red = ((hit.obj.fcolor.red) * ambient) : 0;
-	// res[i].green < ((hit.obj.fcolor.green) * ambient) ? res[i].green = ((hit.obj.fcolor.green) * ambient) : 0;
-	// res[i].blue < ((hit.obj.fcolor.blue) * ambient) ? res[i].blue = ((hit.obj.fcolor.blue) * ambient) : 0;
-
 	res = norme_fcolor(res);
-
-	// final color
 	return (res);
 }
 
@@ -621,9 +602,6 @@ __kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, __glob
 			cur++;
 			continue ;
 		}
-
-
-
 		if (my_queue[cur].hit.obj.transparency_coef > 0.001)
 		{
 			my_queue[count].ray.orig = my_queue[cur].hit.hit_v;
@@ -640,8 +618,7 @@ __kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, __glob
 			count++;
 		}
 
-		my_queue[cur].k = my_queue[cur].k * (1.01 - (my_queue[cur].hit.obj.transparency_coef + my_queue[cur].hit.obj.reflection_coef)); 
-		// printf(" %f %f %f \n", my_queue[cur].hit.obj.fcolor.red, my_queue[cur].hit.obj.fcolor.green, my_queue[cur].hit.obj.fcolor.blue);
+		my_queue[cur].k = my_queue[cur].k * (1. - (my_queue[cur].hit.obj.transparency_coef + my_queue[cur].hit.obj.reflection_coef)); 
 		my_queue[cur].color = shadows(objects, obj_count, light, light_count, my_queue[cur].hit, ambient, my_queue[cur].ray);
 
 		res = add_fcolor(res, make_coef_fcolor(my_queue[cur].color, my_queue[cur].k));
