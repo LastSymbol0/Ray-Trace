@@ -37,6 +37,7 @@ void	object_intersect_build_ocl_source(t_scene *sc, char *KernelSource, char *Ke
 	OCL[1].object_intersect_kernel = clCreateKernel(OCL[1].object_intersect_program, KernelName, &OCL[1].err);
 	if (!OCL[1].object_intersect_kernel || OCL[1].err != CL_SUCCESS)
 		ft_err("Failed to create compute kernel", 1);
+	free(KernelSource);
 }
 
 void	ray_trace_ocl(t_scene *sc)

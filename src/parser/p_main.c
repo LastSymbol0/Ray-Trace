@@ -33,6 +33,8 @@ t_scene	*parser(char *filename)
 	sc = (t_scene *)ft_memalloc(sizeof(t_scene));
 	doc = xmlReadFile(filename, NULL, 0);
 	root = xmlDocGetRootElement(doc);
+	if (!root)
+		ft_err("Something wrong with xml file", 1);
 	scene_memory_alloc(sc, root);
 	if (scene_set_cam(sc, root->children) != 1)
 		ft_err("Something wrong with camera count", 1);

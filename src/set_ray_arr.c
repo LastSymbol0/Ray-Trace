@@ -37,6 +37,7 @@ void	ray_arr_build_ocl_source(t_scene *sc, char *KernelSource, char *KernelName)
 	OCL->ray_arr_kernel = clCreateKernel(OCL->ray_arr_program, KernelName, &OCL->err);
 	if (!OCL->ray_arr_kernel || OCL->err != CL_SUCCESS)
 		ft_err("Failed to create compute kernel", 1);
+	free(KernelSource);	
 }
 
 void	set_ray_arr_ocl(t_scene *sc)
