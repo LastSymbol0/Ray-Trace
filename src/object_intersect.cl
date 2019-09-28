@@ -3,7 +3,7 @@
 #define cl_float3 __float3
 
 #ifndef MAX_QUEUE_SIZE
-# define MAX_QUEUE_SIZE 32
+# define MAX_QUEUE_SIZE 16
 #endif
 
 enum				e_typeobject
@@ -430,6 +430,7 @@ t_hit					objects_intersect(const t_ray ray, __global t_obj *objects, const int 
 	t_hit hit;
 
 	hit.obj.type = NONE;
+	hit.obj.transparency_coef = 0.000000;
 	i = -1;
 	while (++i < obj_count)
 	{
@@ -491,58 +492,106 @@ t_fcolor			shadows(__global t_obj *obj, const int obj_count, __global t_light *l
 	float			k;
 	t_hit			new_hit;
 	t_fcolor		res;
+	t_fcolor		tmp[light_count];
+	// t_fcolor		res[light_count + 1];
+	// t_fcolor		tmp;
 	t_ray			light_ray;
 
-	res.red = 0;
-	res.green = 0;
-	res.blue = 0;
+
+			// printf(" %f %f %f ", hit.obj.fcolor.red, hit.obj.fcolor.green, hit.obj.fcolor.blue);
 	k = ambient;
 	i = -1;
+			// res[0].red = 0.;
+		// res[0].green = 0.;
+		// res[0].blue = 0.;
+				// res[1].red = 0.;
+		// res[1].green = 0.;
+		// res[1].blue = 0.;
+		res.red = 0.;
+		res.green = 0.;
+		res.blue = 0.;	
 	while (++i < light_count)
 	{
+		// res.red = 0.;
+		// res.green = 0.;
+		// res.blue = 0.;
+
 		light_ray.orig = hit.hit_v;
-		light_ray.dir = light[i].pos - hit.hit_v;
+		light_ray.dir = light[i].pos -  hit.hit_v;
 		t = fast_length(light_ray.dir) - 0.1;
 		light_ray.dir = fast_normalize(light_ray.dir);
 
 		new_hit.addr_obj = 0;
 		new_hit = objects_intersect(light_ray, obj, obj_count, new_hit, t);
-		if (new_hit.obj.type == NONE || new_hit.obj.transparency_coef > 0.001)
+		if (new_hit.obj.type == NONE || (new_hit.obj.type != NONE && new_hit.obj.transparency_coef > 0.01))
 		{
 			k = ambient;
-
 			// difuse coef
 			k += equalizer((light[i].intensity / 100) * hit.obj.difuse * pown(dot(light_ray.dir, hit.norm) / (fast_length(light_ray.dir) * fast_length(hit.norm)), 1), 0.0, 100.);
-			
 			// specularity coef
 			k += spec(hit, light_ray, ray);
-			
 			// distanse coef
 			k = equalizer(k * PLUS_INTENSE_LIGHT * equalizer(1.0 / sqrt(t), 0.0, 1.0), ambient, 1.0);
-
-			// drugoi distanse coef
-			// k = k * (1.0/(sqrt(t)));
-
-			// transparency shadows coef
-			if (new_hit.obj.type != NONE && new_hit.obj.transparency_coef > 0.001 && new_hit.addr_obj != hit.addr_obj)
-			{
-				k *= new_hit.obj.transparency_coef;
-				res = add_fcolor(res, make_coef_fcolor(new_hit.obj.fcolor, (1 - new_hit.obj.transparency_coef) / 10));
-			}
-
+			// k = 0.12;
 			res = add_fcolor(res, make_coef_fcolor(mult_fcolor(light[i].fcolor, hit.obj.fcolor), k));
+			// tmp = res[i];
 		}
+		if (new_hit.obj.type != NONE && new_hit.obj.transparency_coef > 0.01)
+		{
+			do
+			{
+				res = make_coef_fcolor(res, new_hit.obj.transparency_coef);
+	
+				k = ambient;
+				// difuse coef
+				k += equalizer((light[i].intensity / 100) * new_hit.obj.difuse * pown(dot(light_ray.dir, new_hit.norm) / (fast_length(light_ray.dir) * fast_length(new_hit.norm)), 1), 0.0, 100.);
+				// specularity coef
+				k += spec(new_hit, light_ray, ray);
+				// distanse coef
+				k = equalizer(k * PLUS_INTENSE_LIGHT * equalizer(1.0 / sqrt(t), 0.0, 1.0), ambient, 1.0);
+				
+				k *= 1 - new_hit.obj.transparency_coef;
+	
+				res = add_fcolor(res, make_coef_fcolor(mult_fcolor(light[i].fcolor, new_hit.obj.fcolor), k));
+	
+				light_ray.orig = new_hit.hit_v;
+				light_ray.dir = light[i].pos - new_hit.hit_v;
+				t = fast_length(light_ray.dir) - 0.1;
+				light_ray.dir = fast_normalize(light_ray.dir);
+		
+				// new_hit.addr_obj = 0;
+				new_hit = objects_intersect(light_ray, obj, obj_count, new_hit, t);
+			}	while (new_hit.obj.type != NONE && new_hit.obj.transparency_coef > 0.01 && new_hit.addr_obj != hit.addr_obj);
+			if (new_hit.obj.type != NONE && new_hit.obj.transparency_coef < 0.01)
+			{
+				res.red = 0;
+				res.green = 0;
+				res.blue = 0;
+			}
+		}
+		tmp[i] = res;
 	}
 
-	res.red < ((hit.obj.fcolor.red) * ambient) ? res.red = ((hit.obj.fcolor.red) * ambient) : 0;
-	res.green < ((hit.obj.fcolor.green) * ambient) ? res.green = ((hit.obj.fcolor.green) * ambient) : 0;
-	res.blue < ((hit.obj.fcolor.blue) * ambient) ? res.blue = ((hit.obj.fcolor.blue) * ambient) : 0;
+	// res.red = 0.;
+	// res.green = 0.;
+	// res.blue = 0.;
+	// i = -1;
+	// while (++i < light_count)
+	// {
+	// 	// printf("%f %f %f", res[i].red, res[i].green, res[i].blue);		
+	// 	res = add_fcolor(res, tmp[i]);
+	// }
+	// printf("\n");
+	// res[light_count].red < ((hit.obj.fcolor.red) * ambient) ? res[light_count].red = ((hit.obj.fcolor.red) * ambient) : 0;
+	// res[i].green < ((hit.obj.fcolor.green) * ambient) ? res[i].green = ((hit.obj.fcolor.green) * ambient) : 0;
+	// res[i].blue < ((hit.obj.fcolor.blue) * ambient) ? res[i].blue = ((hit.obj.fcolor.blue) * ambient) : 0;
 
-	res = norme_fcolor(res);
+	// res[light_count] = norme_fcolor(res[light_count]);
 
 	// final color
 	return (res);
 }
+
 
 __kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, __global t_light *light, const int obj_count, __global unsigned int *pixels, const int light_count, const float ambient, const int max_reflections)
 {
@@ -569,6 +618,8 @@ __kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, __glob
 			continue ;
 		}
 
+
+
 		if (my_queue[cur].hit.obj.transparency_coef > 0.001)
 		{
 			my_queue[count].ray.orig = my_queue[cur].hit.hit_v;
@@ -586,6 +637,7 @@ __kernel void		ray_cast(__global t_ray *ray_arr, __global t_obj *objects, __glob
 		}
 
 		my_queue[cur].k = my_queue[cur].k * (1. - (my_queue[cur].hit.obj.transparency_coef + my_queue[cur].hit.obj.reflection_coef)); 
+		// printf(" %f %f %f \n", my_queue[cur].hit.obj.fcolor.red, my_queue[cur].hit.obj.fcolor.green, my_queue[cur].hit.obj.fcolor.blue);
 		my_queue[cur].color = shadows(objects, obj_count, light, light_count, my_queue[cur].hit, ambient, my_queue[cur].ray);
 
 		res = add_fcolor(res, make_coef_fcolor(my_queue[cur].color, my_queue[cur].k));

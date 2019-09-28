@@ -7,6 +7,7 @@
 		<color> 0000aa </color>
 		<!-- <color> ffffff </color> -->
 		<reflection_coef>20</reflection_coef>
+		<transparency_coef>20</transparency_coef>
 		<difuse>100</difuse>
 	</plane>
 	<plane>
