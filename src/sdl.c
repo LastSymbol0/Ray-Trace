@@ -20,7 +20,7 @@ t_SDL	*sdl_init(t_scene *sc)
 	sdl->pixel = (Uint32 *)ft_memalloc(sizeof(Uint32) * HEIGHT * WIDTH);
 	if (SDL_Init(SDL_INIT_EVERYTHING))
 		ft_err("SDL init error", 1);
-	sdl->window = SDL_CreateWindow(sc->name, SDL_WINDOWPOS_CENTERED,
+	sdl->window = SDL_CreateWindow("RT", SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI |
 			SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS);
 	sdl->surface = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0);

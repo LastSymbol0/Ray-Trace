@@ -307,6 +307,7 @@ cl_float3			parse_vec(char *s);
 t_color				parse_color(char *s);
 short				get_type(char *s);
 void				recurs(xmlNodePtr node, int n);
+int					ft_atoi_free(char *s);
 
 /*
 ** p_set.c

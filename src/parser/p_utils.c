@@ -18,6 +18,7 @@ cl_float3	parse_vec(char *s)
 	char		**split;
 
 	split = ft_strsplit(s, ',');
+	xmlFree(s);
 	if (arr_len(split) != 3)
 		ft_err("Error reading file", 1);
 	v.x = ft_atoi(split[0]);
@@ -37,6 +38,7 @@ t_color		parse_color(char *s)
 	unsigned int	color_tmp;
 
 	color = abs(ft_atoi_base(s, 16));
+	xmlFree(s);
 	color_tmp = color;
 	res.blue = equalizer((color_tmp << 24) >> 24, 1, 255);
 	color_tmp = color;
@@ -61,4 +63,25 @@ short		get_type(char *s)
 	else
 		ft_err("Undefined object name", 1);
 	return (1);
+}
+
+int			ft_atoi_free(char *str)
+{
+	int i;
+	int res;
+	int sign;
+
+	i = 0;
+	res = 0;
+	sign = 1;
+	while (ft_isspace(str[i]) == 1)
+		i++;
+	if (str[i] == '-')
+		sign = -1;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	while (str[i] != '\0' && str[i] >= '0' && str[i] <= '9')
+		res = res * 10 + (str[i++] - '0');
+	xmlFree(str);
+	return (res * sign);
 }

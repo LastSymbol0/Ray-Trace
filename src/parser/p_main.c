@@ -40,5 +40,8 @@ t_scene	*parser(char *filename)
 	scene_set_objects(sc, root);
 	scene_set_lights(sc, root->children);
 	scene_set_obj_types(sc);
+	xmlFreeDoc(doc);
+	xmlCleanupCharEncodingHandlers();
+	xmlCleanupParser();
 	return (sc);
 }

@@ -20,20 +20,20 @@ void	set_object_h(t_scene *sc, int i, xmlNodePtr child)
 		sc->objects[i].rot = v_norm(
 								parse_vec((char *)xmlNodeGetContent(child)));
 	else if (ft_strequ((char *)child->name, "radius"))
-		sc->objects[i].radius = ft_atoi((char *)xmlNodeGetContent(child));
+		sc->objects[i].radius = ft_atoi_free((char *)xmlNodeGetContent(child));
 	else if (ft_strequ((char *)child->name, "color"))
 		sc->objects[i].color = parse_color((char *)xmlNodeGetContent(child));
 	else if (ft_strequ((char *)child->name, "difuse"))
 		sc->objects[i].difuse = FROM_0_TO_1(
-							ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
+							ft_atoi_free((char *)xmlNodeGetContent(child)) / 100.);
 	else if (ft_strequ((char *)child->name, "reflection_coef"))
 		sc->objects[i].reflection_coef = FROM_0_TO_1(
-							ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
+							ft_atoi_free((char *)xmlNodeGetContent(child)) / 100.);
 	else if (ft_strequ((char *)child->name, "transparency_coef"))
 		sc->objects[i].transparency_coef = FROM_0_TO_1(
-							ft_atoi((char *)xmlNodeGetContent(child)) / 100.);
+							ft_atoi_free((char *)xmlNodeGetContent(child)) / 100.);
 	else if (ft_strequ((char *)child->name, "refract_coef"))
-		sc->objects[i].refract_coef = ft_atoi(
+		sc->objects[i].refract_coef = ft_atoi_free(
 									(char *)xmlNodeGetContent(child)) / 10.;
 	else
 		ft_err("Undefined object argument", 1);

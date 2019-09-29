@@ -380,6 +380,17 @@ float				plane_intersect(const t_ray ray, const t_obj plane)
 	return (dist);
 }
 
+float				disc_intersect(const t_ray ray, const t_obj disc)
+{
+	cl_float3 l;
+	float	dist;
+
+	dist = (((dot(disc.rot, disc.pos) - dot(disc.rot, ray.orig)) / dot(ray.dir, disc.rot)));
+	if (fast_length(ray.orig + (ray.dir * dist) - disc.pos) > disc.radius)
+		return (-1);
+	return (dist);
+}
+
 /*********************************************************************************/
 /* Main shit */
 
@@ -484,6 +495,8 @@ t_fcolor			local_color(t_ray light_ray, t_light light, t_hit hit, const float am
 
 	k = ambient;
 	// difuse coef
+	if (hit.obj.type == PLANE && v_cos(light_ray.dir, hit.norm) < 0)
+		hit.norm *= -1;
 	k += equalizer((light.intensity / 100) * hit.obj.difuse * pown(dot(light_ray.dir, hit.norm) / (fast_length(light_ray.dir) * fast_length(hit.norm)), 1), 0.0, 100.);
 	// specularity coef
 	k += spec(hit, light_ray, ray);
@@ -505,6 +518,8 @@ t_fcolor			transparency_shadows(t_fcolor color, t_ray light_ray, t_light light, 
 
 		k = ambient;
 		// difuse coef
+		if (hit->obj.type == PLANE && v_cos(light_ray.dir, hit->norm) < 0)
+				hit->norm *= -1;
 		k += equalizer((light.intensity / 100) * hit->obj.difuse * pown(dot(light_ray.dir, hit->norm) / (fast_length(light_ray.dir) * fast_length(hit->norm)), 1), 0.0, 100.);
 		// specularity coef
 		k += spec(*hit, light_ray, ray);

@@ -25,7 +25,7 @@ void	set_light(t_scene *sc, xmlNodePtr obj, int i)
 				sc->lights[i].pos = parse_vec(
 										(char *)xmlNodeGetContent(child));
 			else if (ft_strequ((char *)child->name, "intensity"))
-				sc->lights[i].intensity = ft_atoi(
+				sc->lights[i].intensity = ft_atoi_free(
 										(char *)xmlNodeGetContent(child));
 			else if (ft_strequ((char *)child->name, "color"))
 				sc->lights[i].color = parse_color(

@@ -14,6 +14,8 @@
 
 void	scene_win_h(struct nk_context *ctx, t_scene *sc)
 {
+	char	*itoa;
+
 	nk_layout_row_dynamic(ctx, 30, 2);
 	nk_label(ctx, "Cam:", NK_TEXT_CENTERED);
 	nk_layout_row_dynamic(ctx, 20, 2);
@@ -26,10 +28,14 @@ void	scene_win_h(struct nk_context *ctx, t_scene *sc)
 	nk_label(ctx, "Scene:", NK_TEXT_CENTERED);
 	nk_layout_row_dynamic(ctx, 20, 2);
 	nk_label(ctx, "Window width:", NK_TEXT_LEFT);
-	nk_label(ctx, ft_itoa(WIDTH), NK_TEXT_LEFT);
+	itoa = ft_itoa(WIDTH);
+	nk_label(ctx, itoa, NK_TEXT_LEFT);
+	free(itoa);
 	nk_layout_row_dynamic(ctx, 20, 2);
 	nk_label(ctx, "Window height:", NK_TEXT_LEFT);
-	nk_label(ctx, ft_itoa(HEIGHT), NK_TEXT_LEFT);
+	itoa = ft_itoa(HEIGHT);
+	nk_label(ctx, itoa, NK_TEXT_LEFT);
+	free(itoa);
 	nk_layout_row_dynamic(ctx, 20, 2);
 	nk_label(ctx, "Max reflections count:", NK_TEXT_LEFT);
 	nk_slider_int(ctx, 0, &sc->max_reflections, 20, 1);
