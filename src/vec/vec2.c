@@ -17,7 +17,7 @@ cl_float3	v_norm(cl_float3 v)
 	return (v_scale(v, 1.0 / (v_magn(v) > 0 ? v_magn(v) : 0.0001)));
 }
 
-float	v_magn(cl_float3 v)
+float		v_magn(cl_float3 v)
 {
 	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
 }

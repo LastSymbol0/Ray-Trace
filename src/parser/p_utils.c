@@ -19,7 +19,7 @@ cl_float3	parse_vec(char *s)
 
 	split = ft_strsplit(s, ',');
 	if (arr_len(split) != 3)
-		ft_err(ft_strjoin("Error reading, fragment: ", s), 1);
+		ft_err("Error reading file", 1);
 	v.x = ft_atoi(split[0]);
 	v.y = ft_atoi(split[1]);
 	v.z = ft_atoi(split[2]);
@@ -30,9 +30,9 @@ cl_float3	parse_vec(char *s)
 	return (v);
 }
 
-t_color	parse_color(char *s)
+t_color		parse_color(char *s)
 {
-	t_color 		res;
+	t_color			res;
 	unsigned int	color;
 	unsigned int	color_tmp;
 
@@ -46,40 +46,19 @@ t_color	parse_color(char *s)
 	return (res);
 }
 
-short	get_type(char *s)
+short		get_type(char *s)
 {
 	if (ft_strequ(s, "plane"))
-		return(PLANE);
+		return (PLANE);
 	else if (ft_strequ(s, "sphere"))
-		return(SPHERE);
+		return (SPHERE);
 	else if (ft_strequ(s, "cylinder"))
-		return(CYLINDER);
+		return (CYLINDER);
 	else if (ft_strequ(s, "cone"))
-		return(CONE);
+		return (CONE);
 	else if (ft_strequ(s, "cam"))
-		return(CAM);
+		return (CAM);
 	else
-		ft_err(ft_strjoin("Undefined object name: ", s), 1);
+		ft_err("Undefined object name", 1);
 	return (1);
-}
-
-void	recurs(xmlNodePtr node, int n)
-{
-	xmlNodePtr	cur;
-
-	cur = node;
-	while (cur)
-	{
-		if (cur->type == XML_ELEMENT_NODE)
-		{
-			set_tabs(n);
-			printf("Node found! Childcount: %lu; Name: %s; ", xmlChildElementCount(cur), cur->name);
-			if (n == 2)
-				printf("Content: %s;\n", xmlNodeGetContent(cur));
-			else
-				printf("\n");
-		}
-		recurs(cur->children, n + 1);
-		cur = cur->next;
-	}
 }

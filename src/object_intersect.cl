@@ -38,13 +38,6 @@ typedef struct		s_fcolor
 	float			blue;
 }					t_fcolor;
 
-// typedef struct		s_vec
-// {
-// 	float			x;
-// 	float			y;
-// 	float			z;
-// }					cl_float3;
-
 typedef struct		s_ray
 {
 	cl_float3		orig;

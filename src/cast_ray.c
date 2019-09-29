@@ -12,25 +12,27 @@
 
 #include "RT.h"
 
-cl_float3	v_matrix(cl_float3	ray, cl_float3 rot)
+void		v_matrix_h(cl_float3 ray, cl_float3 *rot, cl_float3 *fin)
+{
+	rot->x = rot->x * M_PI / 180.;
+	rot->y = rot->y * M_PI / 180.;
+	rot->z = rot->z * M_PI / 180.;
+	fin->x = ray.x;
+	fin->y = ray.y;
+	fin->z = ray.z;
+}
+
+cl_float3	v_matrix(cl_float3 ray, cl_float3 rot)
 {
 	cl_float3	fin;
 	cl_float3	buf;
 
-	rot.x = rot.x * M_PI / 180.;
-	rot.y = rot.y * M_PI / 180.;
-	rot.z = rot.z * M_PI / 180.;
-	
-	fin.x = ray.x;
-	fin.y = ray.y;
-	fin.z = ray.z;
-	// printf("%f %f\n",sqrt(1 - pow(rot.y, 2)), rot.z);
+	v_matrix_h(ray, &rot, &fin);
 	if (rot.y > 0.00001)
 	{
 		fin.y = ray.y * cos(rot.y) - ray.z * sin(rot.y);
 		fin.z = ray.y * sin(rot.y) + ray.z * cos(rot.y);
 	}
-	// printf("%f %f %f\n", fin.x, fin.y, fin.z);
 	buf.x = fin.x;
 	buf.z = fin.z;
 	if (rot.x > 0.00001)
@@ -48,7 +50,7 @@ cl_float3	v_matrix(cl_float3	ray, cl_float3 rot)
 	return (fin);
 }
 
-t_ray	get_ray(t_scene *sc, int x, int y)
+t_ray		get_ray(t_scene *sc, int x, int y)
 {
 	t_ray	ray;
 	float	fov;
@@ -64,26 +66,27 @@ t_ray	get_ray(t_scene *sc, int x, int y)
 	return (ray);
 }
 
-float	object_intersect(const t_ray ray, const t_obj object)
+float		object_intersect(const t_ray ray, const t_obj object)
 {
 	if (object.type == SPHERE)
-		return(sphere_intersect(ray, object));
+		return (sphere_intersect(ray, object));
 	else if (object.type == CYLINDER)
-		return(cylinder_intersect(ray, object));
+		return (cylinder_intersect(ray, object));
 	else if (object.type == CONE)
-		return(cone_intersect(ray, object));
+		return (cone_intersect(ray, object));
 	else if (object.type == PLANE)
-		return(plane_intersect(ray, object));
-	return(0);
+		return (plane_intersect(ray, object));
+	return (0);
 }
 
-t_obj	*cast_ray(t_scene *sc, t_ray ray)
+t_obj		*cast_ray(t_scene *sc, t_ray ray)
 {
 	int		i;
-	float	t = 2147483647;
+	float	t;
 	t_obj	*obj;
 	float	tmp;
 
+	t = 2147483647;
 	obj = NULL;
 	i = -1;
 	while (++i < sc->obj_count)

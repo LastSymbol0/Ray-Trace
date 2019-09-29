@@ -1,60 +1,8 @@
-// typedef struct	s_vec
-// {
-// 	float		x;
-// 	float		y;
-// 	float		z;
-// }				float3;
-
 typedef struct	s_ray
 {
 	float3		orig;
 	float3		dir;
 }				t_ray;
-
-
-// float3	v_add(float3 v1, float3 v2);
-// float3	v_scale(float3 v, float n);
-// float3	normalize(float3 v);
-// float	length(float3 v);
-// float3	v_new(float x, float y, float z);
-
-// float3	v_new(float x, float y, float z)
-// {
-// 	float3 v;
-
-// 	v.x = x;
-// 	v.y = y;
-// 	v.z = z;
-// 	return (v);
-// }
-
-// float3	normalize(float3 v)
-// {
-// 	return (v * (1.0 / length(v)));
-// }
-
-// float	length(float3 v)
-// {
-// 	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
-// }
-
-// float3	v_scale(float3 v, float n)
-// {
-// 	v.x *= n;
-// 	v.y *= n;
-// 	v.z *= n;
-// 	return (v);
-// }
-
-// float3	v_add(float3 v1, float3 v2)
-// {
-// 	float3 v;
-
-// 	v.x = v1.x + v2.x;
-// 	v.y = v1.y + v2.y;
-// 	v.z = v1.z + v2.z;
-// 	return (v);
-// }
 
 float3	v_matrix(float3	ray, float3 rot)
 {

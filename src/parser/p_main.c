@@ -29,7 +29,6 @@ t_scene	*parser(char *filename)
 	xmlDocPtr	doc;
 	xmlNodePtr	root;
 
-	printf("Oh shit!\n");
 	sc = (t_scene *)ft_memalloc(sizeof(t_scene));
 	doc = xmlReadFile(filename, NULL, 0);
 	root = xmlDocGetRootElement(doc);
@@ -41,7 +40,5 @@ t_scene	*parser(char *filename)
 	scene_set_objects(sc, root);
 	scene_set_lights(sc, root->children);
 	scene_set_obj_types(sc);
-	// printf("Root node found!\nName: %s\nAttr0: %s=%s\n\n", root->name, root->properties->name, root->properties->children->content);
-	recurs(root, 0);
-	return(sc);
+	return (sc);
 }

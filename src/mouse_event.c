@@ -15,12 +15,11 @@
 t_obj	*mouse_click(t_scene *sc)
 {
 	t_obj	*obj;
-	int		mouseX;
-	int		mouseY;
+	int		mouse_x;
+	int		mouse_y;
 
-	SDL_GetMouseState(&mouseX, &mouseY);
-	printf("Click! x: %d, y: %d\n", mouseX, mouseY);
-	obj = cast_ray(sc, get_ray(sc, mouseX, mouseY));
+	SDL_GetMouseState(&mouse_x, &mouse_y);
+	obj = cast_ray(sc, get_ray(sc, mouse_x, mouse_y));
 	return (obj);
 }
 

@@ -54,6 +54,7 @@
 # define I_OBJ_HEIGHT 770
 # define RAY_ARR sc->ray_arr
 # define OCL sc->ocl
+# define OCL_OIK OCL[1].object_intersect_kernel
 # define CL_SUCCES 0
 # define OBJECTS_BUFF OCL[1].output[0]
 # define RAY_ARR_BUFF OCL[1].output[1]
@@ -70,6 +71,8 @@
 # define FROM_0_TO_1(a) BIGGER_THEN_0(LOWER_THEN_1((a)))
 # define LOWER_AND_NOT_0(a, b) ((a) < (b) && a > 0) ? (a) : ((b) < (a) && (b) > 0) ? (b) : -1
 
+# define CLICK_CLACK(a) ((a) == 0 ? (a) = 1 : ((a) = 0))
+
 # define OBJ_TYPES_COUNT 5
 enum			e_typeobject
 {
@@ -79,6 +82,13 @@ enum			e_typeobject
 	SPHERE,
 	CYLINDER,
 };
+
+enum			e_color_mode
+{
+	COL_RGB,
+	COL_HSV
+};
+
 
 typedef struct		s_eq
 {
@@ -234,7 +244,11 @@ t_SDL				*sdl_init(t_scene *sc);
 void				sdl_draw(t_scene *sc);
 void				sdl_destroy(t_scene *sc);
 void				sdl_put_pixel(t_scene *sc, int x, int y, int color);
-void 				saveScreenshotBMP(t_scene *sc);
+
+/*
+** sdl_screenshot.c
+*/
+void 				save_screenshot_bmp(t_scene *sc);
 
 /*
 ** sdl_hook.c
@@ -306,9 +320,7 @@ void				scene_set_lights(t_scene *sc, xmlNodePtr cur);
 ** utils.c
 */
 t_fcolor			get_fcolor(t_color color);
-void				pixel_put(int color);
 void				ft_err(char *err, int status);
-void				set_tabs(int n);
 int					arr_len(char **arr);
 char				*read_file(char *filename, size_t file_size);
 char				*get_string_obj_type(int type);

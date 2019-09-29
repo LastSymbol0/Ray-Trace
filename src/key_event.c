@@ -21,13 +21,12 @@ void	w_key_event(t_scene *sc)
 	set_ray_arr_ocl_2(sc);
 	ray_trace_2(sc);
 	sdl_draw(sc);
-	ft_putendl("W!");
 }
 
 void	s_key_event(t_scene *sc)
 {
 	t_ray dir;
-	
+
 	dir = get_ray(sc, WIDTH / 2, HEIGHT / 2);
 	sc->cam.pos = v_add(sc->cam.pos, v_scale(dir.dir, -1));
 	set_ray_arr_ocl_2(sc);

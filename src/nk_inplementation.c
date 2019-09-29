@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "RT.h"
-# define NK_IMPLEMENTATION
-# define NK_SDL_GL2_IMPLEMENTATION
-# include "nuklear/nuklear.h"
-# include "nuklear/demo/sdl_opengl2/nuklear_sdl_gl2.h"
+#define NK_IMPLEMENTATION
+#define NK_SDL_GL2_IMPLEMENTATION
+#include "nuklear/nuklear.h"
+#include "nuklear/demo/sdl_opengl2/nuklear_sdl_gl2.h"

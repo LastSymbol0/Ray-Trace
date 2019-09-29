@@ -12,7 +12,7 @@
 
 #include "RT.h"
 
-t_ray	new_ray(cl_float3 *orig, cl_float3 *dir)
+t_ray		new_ray(cl_float3 *orig, cl_float3 *dir)
 {
 	t_ray	ray;
 
@@ -21,12 +21,12 @@ t_ray	new_ray(cl_float3 *orig, cl_float3 *dir)
 	return (ray);
 }
 
-float	v_angle(cl_float3 a, cl_float3 b)
+float		v_angle(cl_float3 a, cl_float3 b)
 {
 	return (v_dot(a, b) / (v_magn(a) * v_magn(b)));
 }
 
-float	v_dot(cl_float3 a, cl_float3 b)
+float		v_dot(cl_float3 a, cl_float3 b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z);
 }
